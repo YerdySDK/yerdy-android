@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/yerdy_theme_dialog_root"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText,ContentDescription" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <ImageView
+            android:id="@+id/yerdy_theme_dialog_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="10dp">
+        
+        <ImageView
+            android:id="@+id/yerdy_theme_dialog_watermark"
+            android:adjustViewBounds="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/yerdy_theme_dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"/>
+
+        <LinearLayout
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/yerdy_theme_dialog_button_wrapper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/yerdy_theme_dialog_button_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/yerdy_message_button"
+                android:text="Decline" />
+
+            <Button
+                android:id="@+id/yerdy_theme_dialog_button_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:text="Accept"
+                android:background="@drawable/yerdy_message_button"/>
+        </LinearLayout>
+        
+        <TextView
+            android:id="@+id/yerdy_theme_dialog_expiration"
+            android:layout_above="@id/yerdy_theme_dialog_button_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"/>
+        
+        <TextView
+            android:layout_below="@id/yerdy_theme_dialog_title"
+            android:layout_above="@id/yerdy_theme_dialog_expiration"
+            android:id="@+id/yerdy_theme_dialog_message"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:textSize="14sp"/>
+    </RelativeLayout>
+
+</LinearLayout>

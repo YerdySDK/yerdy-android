@@ -1,0 +1,6 @@
+bin/*
+!bin/.gitkeep
+gen/*
+!gen/.gitkeep
+!assets/.gitkeep
+javadoc.xml
