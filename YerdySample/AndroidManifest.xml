@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.yerdy.Sample"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="19" />
+    
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	
+	<!-- GCM Start -->
+	<permission android:name="com.yerdy.Sample.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+	<uses-permission android:name="com.yerdy.Sample.permission.C2D_MESSAGE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+	<uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- GCM END -->
+    
+    <!-- LVL Check Optional -->
+	<uses-permission android:name="com.android.vending.CHECK_LICENSE" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
+        
+        <activity
+            android:name="com.yerdy.Sample.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+		<service android:name="com.yerdy.services.launch.YRDLaunchService"/>
+		<service android:name="com.yerdy.services.messaging.YRDMessagingService"/>
+		<service android:name="com.yerdy.services.messaging.YRDMessageReportService"/>
+		<service android:name="com.yerdy.services.purchases.YRDReportIAPService"/>
+		<service android:name="com.yerdy.services.purchases.YRDReportVirtualPurchaseService"/>
+		<service android:name="com.yerdy.services.core.YRDCounterService"/>
+		
+		<!-- GCM START -->
+        <receiver
+            android:name="com.yerdy.services.push.gcm.GCMBroadcastRecieverEx"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <!-- Must match package on OS level 10-15 -->
+                <category android:name="com.fluik.OfficeZombieGoogleFree" />
+            </intent-filter>
+        </receiver>
+        <service android:name="com.yerdy.services.push.gcm.GCMIntentService" />
+        <meta-data android:name="Yerdy_GCMSenderId" android:value="gcm:958366145980"/>
+        <!-- GCM END -->										   
+		<receiver android:name="com.yerdy.services.push.YRDLocalReceiver"/>
+        
+    </application>
+    
+
+</manifest>

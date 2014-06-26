@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Yerdy Sample</string>
+    
+    <string name="show_message_label">Show Message!</string>
+    
+    
+    <string name="buy_gold">Buy 50 Gold</string>
+    <string name="buy_jewels">Buy Jewel Pack</string>
+    <string name="show_ad">Request Fake Ad</string>
+    <string name="title">Yerdy Sample App</string>
+    
+    <string name="title_log">logEvent - buttonPressed</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    
+    <string name="title_progression">player progression (level)</string>
+    <string name="lvl1">level-1</string>
+    <string name="lvl2">level-2</string>
+    <string name="lvl3">level-3</string>
+    <string name="lvl4">level-4</string>
+    <string name="lvl5">level-5</string>
+    <string name="lvl6">level-6</string>
+    <string name="lvl7">level-7</string>
+    <string name="lvl8">level-8</string>
+    <string name="lvl9">level-9</string>
+    
+    <string name="title_ads">Ad Tracking</string>
+    <string name="title_messaging">Pull Messaging</string>
+    <string name="bank">Bank</string>
+    
+    <string name="gold">Gold</string>
+    <string name="silver">Silver</string>
+    <string name="bronze">Bronze</string>
+    <string name="diamonds">Diamonds</string>
+    <string name="pearls">Pearls</string>
+    <string name="rubies">Rubies</string>
+    
+    <string name="sale">Sale?</string>
+    <string name="item_name">Item Name</string>
+    <string name="buy_item">Buy Item</string>
+    <string name="earn">Earn</string>
+    
+</resources>
