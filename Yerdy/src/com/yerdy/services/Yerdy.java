@@ -347,6 +347,8 @@ public class Yerdy {
 		YRDAnalytics.getInstance().appHandleActivate(context, _currencyTracker.generateCurrencyReport(null), _adRequestTracker.generateReport(), false);
 		queueTimeMilestone();
 		_adRequestTracker.reset();
+		
+		YRDLog.i("Device_ID", YerdyUtil.getUDID(context));
 	}
 	
 	/**
