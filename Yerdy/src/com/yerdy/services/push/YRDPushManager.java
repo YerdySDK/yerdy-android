@@ -1,5 +1,6 @@
 package com.yerdy.services.push;
 
+import android.R;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Notification;
@@ -75,8 +76,10 @@ public class YRDPushManager {
 		}
 
 		if (admAvailiable) {
+			YRDLog.e(YRDPushManager.class, "ADM Availiable");
 			try {
 				ADMManifest.checkManifestAuthoredProperly(cxt);
+				YRDLog.e(YRDPushManager.class, "ADM checked");
 			} catch (Exception e) {
 				allowADMReg = false;
 				YRDLog.e(YRDPushManager.class, e.getMessage());
@@ -227,6 +230,8 @@ public class YRDPushManager {
 	private static Notification buildNotificationGingerbread(Context context,
 			PendingIntent intent, int icon, String title, String message,
 			long when, int defaults) {
+		if(icon == 0)
+			icon = android.R.drawable.ic_menu_info_details;
 		Notification notification = new Notification(icon, message, when);
 		notification.setLatestEventInfo(context, title, message, intent);
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
@@ -239,6 +244,8 @@ public class YRDPushManager {
 	private static Notification buildNotificationHoneycomb(Context context,
 			PendingIntent intent, int icon, String title, String message,
 			long when, int defaults) {
+		if(icon == 0)
+			icon = android.R.drawable.ic_menu_info_details;
 		Notification notification = new Notification.Builder(context)
 				.setContentTitle(title).setContentText(message)
 				.setSmallIcon(icon).setContentIntent(intent)

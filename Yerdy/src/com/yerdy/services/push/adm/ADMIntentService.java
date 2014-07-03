@@ -61,6 +61,7 @@ public class ADMIntentService extends ADMMessageHandlerBase {
 	}
     
     public static void notify(Context context, MessageID msgId, String title, String message) {
+    	YRDLog.i(ADMIntentService.class, "notify (msgid)::(title)::(message): " + msgId + " :: " + title + " :: " + message );
         int icon = YRDPushManager.ICON;
         if(icon == 0) {
     		// Prep native-type Notification object. Use Resources instead of R,
@@ -97,7 +98,7 @@ public class ADMIntentService extends ADMMessageHandlerBase {
         
         if(cls == null)
         {
-    		YRDLog.e(GCMIntentService.class, "cls == null");
+    		YRDLog.e(ADMIntentService.class, "cls == null");
         	return;
         }
         
