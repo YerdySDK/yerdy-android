@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:amazon="http://schemas.amazon.com/apk/res/android"
     package="com.yerdy.Sample"
     android:versionCode="1"
     android:versionName="1.0" >
@@ -20,6 +21,13 @@
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<uses-permission android:name="android.permission.VIBRATE"/>
     <!-- GCM END -->
+		
+	<!-- Amazon ADM Start -->
+	<permission android:name="com.yerdy.Sample.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
+	<uses-permission android:name="com.yerdy.Sample.permission.RECEIVE_ADM_MESSAGE" />
+	<uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<!-- Amazon ADM End -->
     
     <!-- LVL Check Optional -->
 	<uses-permission android:name="com.android.vending.CHECK_LICENSE" />
@@ -56,13 +64,29 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
                 <!-- Must match package on OS level 10-15 -->
-                <category android:name="com.fluik.OfficeZombieGoogleFree" />
+                <category android:name="com.yerdy.Sample" />
             </intent-filter>
         </receiver>
         <service android:name="com.yerdy.services.push.gcm.GCMIntentService" />
-        <meta-data android:name="Yerdy_GCMSenderId" android:value="gcm:958366145980"/>
+        <meta-data android:name="Yerdy_GCMSenderId" android:value="gcm:999999999999"/>
         <!-- GCM END -->										   
 		<receiver android:name="com.yerdy.services.push.YRDLocalReceiver"/>
+		
+		<!-- Amazon ADM Start -->
+		<amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false"/>
+		<service android:name="com.yerdy.services.push.adm.ADMIntentService" android:exported="false" />
+		<receiver android:name="com.yerdy.services.push.adm.ADMIntentService$ADMBroadcastReciever"
+			android:permission="com.amazon.device.messaging.permission.SEND" >
+		 
+			<!-- To interact with ADM, your app must listen for the following intents. -->
+			<intent-filter>
+				<action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
+				<action android:name="com.amazon.device.messaging.intent.RECEIVE" />
+				<!-- Replace the name in the category tag with your app's package name. -->
+				<category android:name="com.yerdy.Sample" />
+			</intent-filter>
+		</receiver>
+		<!-- Amazon ADM End -->
         
     </application>
     
