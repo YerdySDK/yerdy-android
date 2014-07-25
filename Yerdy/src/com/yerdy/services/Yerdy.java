@@ -68,7 +68,7 @@ import com.yerdy.services.util.YerdyUtil;
  		Yerdy.getInstance().showMessage(this, "launch");}</pre>
  *   
  * <h3>Handling message triggered rewards and purchases</h3>
- * <p>An important part of Yerdy’s messaging features is being able to reward the user or trigger a purchase inside the app (for example, when an item is on sale). To support this, you need to implement the {@link com.yerdy.services.YerdyMessageDelegate YerdyMessageDelegate}</p>
+ * <p>An important part of Yerdyï¿½s messaging features is being able to reward the user or trigger a purchase inside the app (for example, when an item is on sale). To support this, you need to implement the {@link com.yerdy.services.YerdyMessageDelegate YerdyMessageDelegate}</p>
  * <pre>{@code
 	&#064;Override
 	public void handleInAppPurchase(YRDInAppPurchase purchase) {
@@ -348,7 +348,8 @@ public class Yerdy {
 		queueTimeMilestone();
 		_adRequestTracker.reset();
 		
-		YRDLog.i("Device_ID", YerdyUtil.getUDID(context));
+		YRDLog.i(this.getClass(), "To enable test mode for this device, copy/paste the device ID below into the Yerdy dashboard.");
+		YRDLog.i(this.getClass(), "Device ID: " + YerdyUtil.getUDID(context));
 	}
 	
 	/**
@@ -495,7 +496,7 @@ public class Yerdy {
 	/**
 	 * Tracks a screen visit
 	 * 
-	 * @param name The name of the screen (for example: “settings”, “store”, etc…)
+	 * @param name The name of the screen (for example: ï¿½settingsï¿½, ï¿½storeï¿½, etcï¿½)
 	 * @category Event Tracking
 	 */
 	public void logScreenVisit(String name) {
@@ -597,7 +598,7 @@ public class Yerdy {
 	
 	/**
 	 * Returns messages currently available at specified placement
-	 * @param placement The placement (for example, you could have “launch”, “gameover”, and “store”). Pass in nil for any placement.
+	 * @param placement The placement (for example, you could have ï¿½launchï¿½, ï¿½gameoverï¿½, and ï¿½storeï¿½). Pass in nil for any placement.
 	 * @return messages available in placement
 	 * @category Messaging
 	 */
@@ -614,7 +615,7 @@ public class Yerdy {
 	
 	/**
 	 * Checks if a message is available for the given placement
-	 * @param placement The placement (for example, you could have “launch”, “gameover”, and “store”). Pass in nil for any placement.
+	 * @param placement The placement (for example, you could have ï¿½launchï¿½, ï¿½gameoverï¿½, and ï¿½storeï¿½). Pass in nil for any placement.
 	 * @return Whether or not a message is available
 	 * @category Messaging
 	 */
@@ -749,7 +750,7 @@ public class Yerdy {
 	/**
 	 * Shows a message (if available)
 	 * @param activity activity context that the message will be shown in
-	 * @param placement The placement (for example, you could have “launch”, “gameover”, and “store”). Pass in null for any placement.
+	 * @param placement The placement (for example, you could have ï¿½launchï¿½, ï¿½gameoverï¿½, and ï¿½storeï¿½). Pass in null for any placement.
 	 * @return Whether or not a message was shown
 	 * @category Messaging
 	 */
@@ -1003,7 +1004,7 @@ public class Yerdy {
 	
 	/**
 	 * Logs a player progression event.
-	 * <p>Milestones are grouped by category. For example, you may have a ‘map’ category and your milestones could be ‘unlocked world 1’, ‘unlocked world 2’, ‘unlocked world 3’, etc…</p>
+	 * <p>Milestones are grouped by category. For example, you may have a ï¿½mapï¿½ category and your milestones could be ï¿½unlocked world 1ï¿½, ï¿½unlocked world 2ï¿½, ï¿½unlocked world 3ï¿½, etcï¿½</p>
 	 * @param category The category for this progression event
 	 * @param milestone The milestone the user reached
 	 * @category Event Tracking
@@ -1075,8 +1076,8 @@ public class Yerdy {
 	}
 	
 	/**
-	 * Sets a limit to the number of “failover” messages that can be shown
-	 * <p>If the user clicks “cancel” (or “ok” on a non actionable message), we try and show another message for that placement (until we run out of messages). You can set a limit here. (for example, if you wanted to only show 1 message no matter what, you can call:</p>
+	 * Sets a limit to the number of ï¿½failoverï¿½ messages that can be shown
+	 * <p>If the user clicks ï¿½cancelï¿½ (or ï¿½okï¿½ on a non actionable message), we try and show another message for that placement (until we run out of messages). You can set a limit here. (for example, if you wanted to only show 1 message no matter what, you can call:</p>
 	 * <pre>{@code Yerdy.getInstance().setMaxFailoverCount(0, "myPlacement")}</pre>
 	 * <p>If you would like to apply it to all placements in your app, pass in nil for placement:</p>
 	 * <pre>{@code Yerdy.getInstance().setMaxFailoverCount(0, "myPlacement")}</pre>
