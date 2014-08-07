@@ -348,6 +348,7 @@ public class Yerdy {
 		queueTimeMilestone();
 		_adRequestTracker.reset();
 		
+		YRDLog.i(this.getClass(), "Starting.  Version: " + YerdyVersion.VERSION);
 		YRDLog.i(this.getClass(), "To enable test mode for this device, copy/paste the device ID below into the Yerdy dashboard.");
 		YRDLog.i(this.getClass(), "Device ID: " + YerdyUtil.getUDID(context));
 	}
