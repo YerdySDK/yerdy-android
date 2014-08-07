@@ -605,7 +605,8 @@ public class Yerdy {
 	private YRDMessage getMessageForPlacement(String placement) {
 		if(_messages != null && _messages.size() > 0) {
 			for(YRDMessage m : _messages) {
-				if(placement == null || m.placement.toLowerCase(Locale.getDefault()).equals(placement.toLowerCase(Locale.getDefault())))
+				if(placement == null || m.placement.equals("*") ||
+						m.placement.toLowerCase(Locale.getDefault()).equals(placement.toLowerCase(Locale.getDefault())))
 					return m;
 			}
 		}
