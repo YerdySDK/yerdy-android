@@ -44,7 +44,7 @@ public class YRDCurrencyTracker {
 		_purchased = parse(conversion);
 		YRDLog.i(getClass(), "Purchased: " + conversion);
 		
-		_timedCurrency = _persistance.getCounter(AnalyticKey.CURRENCY_TIMED);
+		_timedCurrency = _persistance.getJSON(AnalyticKey.CURRENCY_TIMED);
 	}
 	
 	public void configure(String[] names) {
@@ -121,7 +121,7 @@ public class YRDCurrencyTracker {
 			if(index >= 0 && index < MAX_CURRENCIES) {
 				target.set(index, target.get(index) + value);
 				updateMilestones(counterLabel, index, value);
-				_persistance.setCounter(AnalyticKey.CURRENCY_TIMED, _timedCurrency);
+				_persistance.setJSON(AnalyticKey.CURRENCY_TIMED, _timedCurrency);
 				_persistance.save();
 			} else {
 				YRDLog.e(this.getClass(), String.format("'%s' unrecognized as a valid currency", name));
@@ -149,7 +149,7 @@ public class YRDCurrencyTracker {
 			}
 			
 			if(updatedMilestones) {
-				_persistance.setCounter(AnalyticKey.CURRENCY_TIMED, _timedCurrency);
+				_persistance.setJSON(AnalyticKey.CURRENCY_TIMED, _timedCurrency);
 				_persistance.save();
 			}
 		}

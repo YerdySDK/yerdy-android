@@ -136,7 +136,7 @@ public class YerdyUnity {
 	
 	public void playerProgression(String category, String milestone) {
 		YRDLog.i(YerdyUnity.class, "playerProgression:"+category+","+milestone);
-		Yerdy.getInstance().playerProgression(category, milestone);
+		Yerdy.getInstance().logPlayerProgression(category, milestone);
 	}
 	
 	public void logEvent(String name, Map<String, String>map) {

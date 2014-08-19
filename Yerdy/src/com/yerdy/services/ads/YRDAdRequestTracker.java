@@ -24,7 +24,7 @@ public class YRDAdRequestTracker {
 
 	public YRDAdRequestTracker(Context cxt) {
 		_persistance = new YRDPersistence(cxt, cxt.getApplicationInfo().packageName, false);
-		_ads = _persistance.getCounter(AnalyticKey.ADS_VERSIONED);
+		_ads = _persistance.getJSON(AnalyticKey.ADS_VERSIONED);
 	}
 	
 	public void reset() {
@@ -68,7 +68,7 @@ public class YRDAdRequestTracker {
 		}
 		
 		if(_persistance != null) {
-			_persistance.setCounter(AnalyticKey.ADS_VERSIONED, _ads);
+			_persistance.setJSON(AnalyticKey.ADS_VERSIONED, _ads);
 			_persistance.save();
 		}
 		

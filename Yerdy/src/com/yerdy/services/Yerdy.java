@@ -1041,15 +1041,30 @@ public class Yerdy {
 	}
 	
 	/**
-	 * Logs a player progression event.
+	 * Starts a player progression category.
 	 * <p>Milestones are grouped by category. For example, you may have a �map� category and your milestones could be �unlocked world 1�, �unlocked world 2�, �unlocked world 3�, etc�</p>
 	 * @param category The category for this progression event
 	 * @param milestone The milestone the user reached
 	 * @category Event Tracking
 	 */
-	public void playerProgression(String category, String milestone) {
+	public void startPlayerProgression(String category, String milestone) {
 		if(YRDAnalytics.getInstance().shouldTrackUser())
-			_progressionTracker.trackProgression(scrubName(category), "_"+milestone, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
+			_progressionTracker.startProgression(scrubName(category), milestone, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
+	}
+	
+	/**
+	 * Logs a player progression event for an existing.
+	 * <p>
+	 * Milestones are grouped by category. For example, you may have a �map� category and your milestones could be �unlocked world 1�, �unlocked world 2�, �unlocked world 3�, etc�
+	 * NOTE: You must start a player progression category with 'startPlayerProgression(...)' before logging additional events to it.
+	 * </p>
+	 * @param category The category for this progression event
+	 * @param milestone The milestone the user reached
+	 * @category Event Tracking
+	 */
+	public void logPlayerProgression(String category, String milestone) {
+		if(YRDAnalytics.getInstance().shouldTrackUser())
+			_progressionTracker.trackProgression(scrubName(category), milestone, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
 	}
 	
 	private void sendEvents(Context cxt) {

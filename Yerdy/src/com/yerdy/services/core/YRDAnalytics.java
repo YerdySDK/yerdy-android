@@ -177,7 +177,7 @@ public class YRDAnalytics {
 		info.put("playtime", getPlaytimeS(true));
 		info.put("currency", currencyReport.getTotals());
 		
-		JSONObject loggedScreenVisits = keychainData.getCounter(AnalyticKey.SCREEN_VISITS);
+		JSONObject loggedScreenVisits = keychainData.getJSON(AnalyticKey.SCREEN_VISITS);
 		keychainData.deleteKey(AnalyticKey.SCREEN_VISITS);
 		keychainData.save();
 		_screenVisits = new JSONObject();

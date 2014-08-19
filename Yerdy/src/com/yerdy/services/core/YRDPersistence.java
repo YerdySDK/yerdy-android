@@ -56,6 +56,7 @@ public class YRDPersistence implements Serializable {
 		CURRENCY_TIMED,
 		VIRTUAL_PURCHASE_COUNT_TIMED,
 		PROGRESSION_EVENTS,
+		PROGRESSION_ALL_LOGGED_EVENTS,
 		CUSTOM_EVENTS,
 		IS_PRE_YERDY_USER,
 		TRACK_PRE_YERDY_USER,
@@ -163,11 +164,11 @@ public class YRDPersistence implements Serializable {
 		return list;
 	}
 	
-	public void setCounter(CharSequence key, JSONObject value) {
+	public void setJSON(CharSequence key, JSONObject value) {
 		editor.putString(key.toString(), value.toString());
 	}
 	
-	public JSONObject getCounter(CharSequence key) {
+	public JSONObject getJSON(CharSequence key) {
 		String jsonStr = preferences.getString(key.toString(), null);
 		if(jsonStr != null) {
 			try {

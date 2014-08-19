@@ -99,14 +99,24 @@ public class MainActivity extends Activity implements YerdyDelegate,
 			Yerdy.getInstance().logEvent("buttonPressed", params);
 		}
 	}
+	
+	/*
+	 * Starts level progression ("level-1")
+	 */
+	public void onStartPlayerProgression(View v) {
+		String label = getButtonLabel(v);
+		if (label != null) {
+			Yerdy.getInstance().startPlayerProgression("level", label);
+		}
+	}
 
 	/*
-	 * Reports level progressions ("level-1" - "level-9" buttons)
+	 * Reports level progressions ("level-2" - "level-9" buttons)
 	 */
 	public void onPlayerProgression(View v) {
 		String label = getButtonLabel(v);
 		if (label != null) {
-			Yerdy.getInstance().playerProgression("level", label);
+			Yerdy.getInstance().logPlayerProgression("level", label);
 		}
 	}
 

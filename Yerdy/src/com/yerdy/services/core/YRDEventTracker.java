@@ -18,7 +18,7 @@ public class YRDEventTracker {
 	
 	public YRDEventTracker(Context cxt) {
 		_persistance = new YRDPersistence(cxt, cxt.getApplicationInfo().packageName, false);
-		_tracked = _persistance.getCounter(AnalyticKey.CUSTOM_EVENTS);
+		_tracked = _persistance.getJSON(AnalyticKey.CUSTOM_EVENTS);
 	}
 	
 	public void trackEvent(String name, Map<String, String> map, int count) throws JSONException {
@@ -54,7 +54,7 @@ public class YRDEventTracker {
 		_tracked.put(name, named);
 		YRDLog.i("test", _tracked.toString(1));
 			
-		_persistance.setCounter(AnalyticKey.CUSTOM_EVENTS, _tracked);
+		_persistance.setJSON(AnalyticKey.CUSTOM_EVENTS, _tracked);
 		_persistance.save();
 	}
 
@@ -65,7 +65,7 @@ public class YRDEventTracker {
 	public JSONObject getAndResetCustomEvents() {
 		JSONObject response = _tracked;
 		_tracked = new JSONObject();
-		_persistance.setCounter(AnalyticKey.CUSTOM_EVENTS, _tracked);
+		_persistance.setJSON(AnalyticKey.CUSTOM_EVENTS, _tracked);
 		_persistance.save();
 		return response;
 	}

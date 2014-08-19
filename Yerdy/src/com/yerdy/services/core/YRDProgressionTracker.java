@@ -2,6 +2,7 @@ package com.yerdy.services.core;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import com.yerdy.services.core.YRDPersistence.AnalyticKey;
 import com.yerdy.services.logging.YRDLog;
@@ -10,7 +11,13 @@ import android.content.Context;
 
 public class YRDProgressionTracker {
 
+	// contents are reset each time data is pushed up the server
+	// format:  { "group1" : { "event1": { "counter" : .., "playtime": ..., "launches": ... }, "event2" : {...}, ... }, ... }
 	private JSONObject _tracked = new JSONObject();
+	
+	// all events ever logged (only names stored, to prevent duplicates)
+	// format:  { "group1" : [ "all", "logged", "events", "for", "group1" ], "group2" : [ "events" ] }
+	private JSONObject _allLoggedEvents;
 	
 	private YRDPersistence _persistance;
 	
@@ -20,27 +27,73 @@ public class YRDProgressionTracker {
 	
 	public YRDProgressionTracker(Context cxt) {
 		_persistance = new YRDPersistence(cxt, cxt.getApplicationInfo().packageName, false);
-		_tracked = _persistance.getCounter(AnalyticKey.PROGRESSION_EVENTS);
+		_tracked = _persistance.getJSON(AnalyticKey.PROGRESSION_EVENTS);
+		_allLoggedEvents = _persistance.getJSON(AnalyticKey.PROGRESSION_ALL_LOGGED_EVENTS);
+	}
+	
+	public void startProgression(String group, String event, int launches, long playtime) {
+		if (wasGroupStarted(group)) {
+			YRDLog.e(getClass(), String.format(
+					"Failed to start player progression category '%s' with milestone '%s', already started", group, event));
+			YRDLog.e(getClass(), "The 'logPlayerProgression(...)' method can be used to log additional milestones for a category");
+			return;
+		}
+		
+		storeProgression(group, event, launches, playtime);
 	}
 
-	public void trackProgression(String group, String event, int lauches, long playtime) {
+	public void trackProgression(String group, String event, int launches, long playtime) {
+		if (!wasGroupStarted(group)) {
+			YRDLog.e(getClass(), String.format(
+					"Failed to log player progression category '%s' with milestone '%s', category was never started.", group, event));
+			YRDLog.e(getClass(), "The 'startPlayerProgression(...)' method can be used to start a category");
+			return;
+		}
+		
+		if (wasEventLogged(group, event)) {
+			YRDLog.e(getClass(), String.format(
+					"Failed to log player progression category '%s' with milestone '%s', milestone was already logged.", group, event));
+			return;
+		}
+		
+		storeProgression(group, event, launches, playtime);
+	}
+	
+	// startProgression/trackProgression do some sanity checks/validation, then call this method to write the event
+	private void storeProgression(String group, String event, int launches, long playtime) {
+		event = "_" + event; // to coerce it to a string for the services
+		
+		// update counters
 		JSONObject groupJson = _tracked.optJSONObject(group);
 		
 		if(groupJson != null) {
 			try
 			{
 				JSONObject data = groupJson.optJSONObject(event);
-				groupJson.put(event, (data != null)?(updateData(data, lauches, playtime)):(createData(lauches, playtime)));
+				groupJson.put(event, (data != null)?(updateData(data, launches, playtime)):(createData(launches, playtime)));
 			} catch (Exception e) { }
 		} else {
 			try {
-				_tracked.put(group, createGroup(event, lauches, playtime));
+				_tracked.put(group, createGroup(event, launches, playtime));
 			} catch (JSONException e) {
 				YRDLog.w(getClass(), "Failed to store progression event");
 			}
 		}
 		
-		_persistance.setCounter(AnalyticKey.PROGRESSION_EVENTS, _tracked);
+		// update all logged events
+		try {
+			JSONArray groupLoggedEvents = _allLoggedEvents.optJSONArray(group);
+			if (groupLoggedEvents == null) {
+				groupLoggedEvents = new JSONArray();
+				_allLoggedEvents.put(group, groupLoggedEvents);
+			}
+			groupLoggedEvents.put(event);
+		} catch (JSONException e) {
+			YRDLog.w(getClass(), "Failed to store list of logged progression events");
+		}
+		
+		_persistance.setJSON(AnalyticKey.PROGRESSION_EVENTS, _tracked);
+		_persistance.setJSON(AnalyticKey.PROGRESSION_ALL_LOGGED_EVENTS, _allLoggedEvents);
 		_persistance.save();
 		
 		YRDLog.i(getClass(), "POST UPDATE");
@@ -84,8 +137,27 @@ public class YRDProgressionTracker {
 	public JSONObject getAndResetProgressionEvents() {
 		JSONObject response = _tracked;
 		_tracked = new JSONObject();
-		_persistance.setCounter(AnalyticKey.PROGRESSION_EVENTS, _tracked);
+		_persistance.setJSON(AnalyticKey.PROGRESSION_EVENTS, _tracked);
 		_persistance.save();
 		return response;
+	}
+	
+	
+	private boolean wasGroupStarted(String group) {
+		return _allLoggedEvents.optJSONArray(group) != null;
+	}
+	
+	private boolean wasEventLogged(String group, String event) {
+		JSONArray arr = _allLoggedEvents.optJSONArray(group);
+		if (arr == null)
+			return false;
+		
+		for (int i = 0; i < arr.length(); i++) {
+			String item = arr.optString(i, "");
+			if (item.equals(event))
+				return true;
+		}
+		
+		return false;
 	}
 }
