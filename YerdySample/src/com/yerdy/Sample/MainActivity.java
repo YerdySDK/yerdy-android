@@ -393,10 +393,15 @@ public class MainActivity extends Activity implements YerdyDelegate,
 	public void willDismissMessageForPlacement(String placement) {
 		Log.i("MessageDelegate", "Will dismiss message");
 	}
-
+	
 	@Override
 	public void didDismissMessageForPlacement(String placement) {
 		Log.i("MessageDelegate", "Did dismiss message");
+	}
+	
+	@Override
+	public boolean shouldShowAnotherMessageAfterUserCancelForPlacement(String placement) {
+		return true;
 	}
 
 	@Override

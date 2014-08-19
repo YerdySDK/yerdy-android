@@ -53,6 +53,14 @@ public interface YerdyMessageDelegate {
 	public void didDismissMessageForPlacement(String placement);
 
 	/**
+	 * Called after a user has "cancelled" the message.  If you wish to show another message to the user (if available),
+	 * return <code>true</code>, otherwise return <code>false</code>
+	 * @param placement The placement passed in to {@link com.yerdy.services.Yerdy #showMessage(android.app.Activity, String)}
+	 * @return true if another message should be shown, otherwise false
+	 */
+	public boolean shouldShowAnotherMessageAfterUserCancelForPlacement(String placement);
+	
+	/**
 	 * Called when your app should handle an in-app purchase
 	 * @param purchase An object containing the product identifier for the in-app purchase
 	 * @see #handleItemPurchase(YRDItemPurchase)

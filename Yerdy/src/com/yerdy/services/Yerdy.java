@@ -158,8 +158,6 @@ public class Yerdy {
 	private boolean _didDismissMessage = false;
 	private String _currentPlacement = null;
 	private long _lastProgressionReport = -1;
-	private int _defaultMaxFailverCount = Integer.MAX_VALUE;
-	private Map<String, Integer> _maxFailverCounts = new HashMap<String, Integer>();
 
 	private final long PROGRESSION_THRESHOLD = 120000;
 	
@@ -1014,14 +1012,12 @@ public class Yerdy {
 		}
 		
 		private boolean shouldShowAnotherMessage() {
-			int max = _defaultMaxFailverCount;
-			if(_currentPlacement != null && _maxFailverCounts.containsKey(_currentPlacement))
-				max = _maxFailverCounts.get(_currentPlacement);
-			
-			if (_messagesPresentedInRow > max)
+			boolean canShow = (!_didDismissMessage && isMessageAvailiable(_currentPlacement));
+			if (canShow && _yerdyMessageDelegate != null && 
+					_yerdyMessageDelegate.shouldShowAnotherMessageAfterUserCancelForPlacement(_currentPlacement))
+				return true;
+			else
 				return false;
-			
-			return (!_didDismissMessage && isMessageAvailiable(_currentPlacement));
 		}
 	}
 	
@@ -1126,24 +1122,6 @@ public class Yerdy {
 	
 	private String scrubName(String name) {
 		return name.replaceAll("[^a-zA-Z0-9 ._-]", "");
-	}
-	
-	/**
-	 * Sets a limit to the number of �failover� messages that can be shown
-	 * <p>If the user clicks �cancel� (or �ok� on a non actionable message), we try and show another message for that placement (until we run out of messages). You can set a limit here. (for example, if you wanted to only show 1 message no matter what, you can call:</p>
-	 * <pre>{@code Yerdy.getInstance().setMaxFailoverCount(0, "myPlacement")}</pre>
-	 * <p>If you would like to apply it to all placements in your app, pass in nil for placement:</p>
-	 * <pre>{@code Yerdy.getInstance().setMaxFailoverCount(0, "myPlacement")}</pre>
-	 * @param count
-	 * @param placement
-	 * @category Configuration
-	 */
-	public void setMaxFailoverCount(int count, String placement) {
-		if(placement == null) {
-			_defaultMaxFailverCount = count;
-		} else {
-			_maxFailverCounts.put(placement, count);
-		}
 	}
 	
 	/**

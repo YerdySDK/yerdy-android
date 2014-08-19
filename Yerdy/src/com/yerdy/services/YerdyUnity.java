@@ -143,12 +143,7 @@ public class YerdyUnity {
 		YRDLog.i(YerdyUnity.class, "logEvent:"+map);
 		Yerdy.getInstance().logEvent(name, map);
 	}
-	
-	public void setMaxFailoverCount(int count, String placement) {
-		YRDLog.i(YerdyUnity.class, "setMaxFailoverCount:"+count+","+placement);
-		Yerdy.getInstance().setMaxFailoverCount(count, placement);
-	}
-	
+		
 	public void setLogLevel(YRDLogLevel level) {
 		YRDLog.i(YerdyUnity.class, "setLogLevel:" + level.name());
 		YRDLog.SetLogLevel(level);
@@ -188,6 +183,12 @@ public class YerdyUnity {
 		}
 		
 		@Override
+		public boolean shouldShowAnotherMessageAfterUserCancelForPlacement(String placement) {
+			//TODO: Implement proper handling of this in Unity plugin
+			return false;
+		}
+		
+		@Override
 		public void handleReward(YRDReward reward) {
 			List<String> message = new ArrayList<String>();
 			for(YRDRewardItem rewardItem : reward.getRewards()) {
@@ -195,7 +196,7 @@ public class YerdyUnity {
 			}
 			UnityPlayer.UnitySendMessage("YerdyCallbacks", "_HandleRewards", TextUtils.join(";", message));
 		}
-		
+
 		@Override
 		public void handleItemPurchase(YRDItemPurchase purchase) {
 			UnityPlayer.UnitySendMessage("YerdyCallbacks", "_HandleItemPurchase", purchase.getItem());
