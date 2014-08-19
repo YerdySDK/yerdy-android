@@ -116,7 +116,7 @@ public class YerdyUnity {
 
 	public void earnedCurrency(Map<String, Integer> currencies) {
 		YRDLog.i(YerdyUnity.class, "earnedCurrency:"+currencies.toString());
-		Yerdy.getInstance().earnedCurrency(getRootActivity(), currencies);
+		Yerdy.getInstance().earnedCurrency(currencies);
 	}
 	
 	public boolean showMessage(String placement) {

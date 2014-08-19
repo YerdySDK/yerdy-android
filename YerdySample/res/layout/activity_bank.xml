@@ -97,7 +97,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/gold"
-            android:inputType="number"
+            android:inputType="number|numberSigned"
             android:maxLines="1" />
 
         <EditText
@@ -107,7 +107,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/silver"
-            android:inputType="number"
+            android:inputType="number|numberSigned"
             android:maxLines="1" />
 
         <EditText
@@ -117,7 +117,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/bronze"
-            android:inputType="number"
+            android:inputType="number|numberSigned"
             android:maxLines="1" />
     </LinearLayout>
 
@@ -132,7 +132,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/diamonds"
-            android:inputType="number"
+            android:inputType="number|numberSigned"
             android:maxLines="1" />
 
         <EditText
@@ -142,7 +142,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/pearls"
-            android:inputType="number"
+            android:inputType="number|numberSigned"
             android:maxLines="1" />
 
         <EditText
@@ -152,7 +152,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/rubies"
-            android:inputType="number"
+            android:inputType="number|numberSigned"
             android:maxLines="1" />
     </LinearLayout>
 

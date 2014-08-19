@@ -51,7 +51,7 @@ public class YRDCurrencyTracker {
 		for(int i = 0; i < names.length; i++) {
 			String name = names[i];
 			if(i >= MAX_CURRENCIES) {
-				YRDLog.e(this.getClass(), String.format("Outside range of possible currencies ignoring \"{0}\"", name));
+				YRDLog.e(this.getClass(), String.format("Outside range of possible currencies ignoring \"%s\"", name));
 				continue;
 			} else {
 				_names.add(i, name);
@@ -124,7 +124,7 @@ public class YRDCurrencyTracker {
 				_persistance.setCounter(AnalyticKey.CURRENCY_TIMED, _timedCurrency);
 				_persistance.save();
 			} else {
-				YRDLog.e(this.getClass(), String.format("'{0}' unrecognized as a valid currency", name));
+				YRDLog.e(this.getClass(), String.format("'%s' unrecognized as a valid currency", name));
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public class YRDCurrencyTracker {
 					updateMilestones(counterLabel, index, value);
 					updatedMilestones = true;
 				} else {
-					YRDLog.e(this.getClass(), String.format("'{0}' unrecognized as a valid currency", name));
+					YRDLog.e(this.getClass(), String.format("'%s' unrecognized as a valid currency", name));
 				}
 			}
 			

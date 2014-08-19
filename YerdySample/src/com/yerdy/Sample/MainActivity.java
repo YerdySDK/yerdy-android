@@ -130,12 +130,12 @@ public class MainActivity extends Activity implements YerdyDelegate,
 	 * Checks for and displays pull messages if they exist
 	 */
 	public void onGetMessageClick(View v) {
-		boolean hasMessage = Yerdy.getInstance().isMessageAvailiable(null);
+		boolean hasMessage = Yerdy.getInstance().isMessageAvailiable("test");
 		if (!hasMessage) {
 			showAlert("No Messages",
 					"No messages are currently availiable for the selected placement");
 		} else {
-			Yerdy.getInstance().showMessage(this, null);
+			Yerdy.getInstance().showMessage(this, "test");
 		}
 	}
 
@@ -234,14 +234,14 @@ public class MainActivity extends Activity implements YerdyDelegate,
 			_currencyManager.add(g, s, b, d, p, r);
 
 			Map<String, Integer> currencies = new HashMap<String, Integer>();
-			currencies.put(CURRENCIES.GOLD.name(), g);
-			currencies.put(CURRENCIES.SILVER.name(), s);
-			currencies.put(CURRENCIES.BRONZE.name(), b);
-			currencies.put(CURRENCIES.DIAMONDS.name(), d);
-			currencies.put(CURRENCIES.PEARLS.name(), p);
-			currencies.put(CURRENCIES.RUBIES.name(), r);
+			currencies.put(CURRENCIES.GOLD.getName(), g);
+			currencies.put(CURRENCIES.SILVER.getName(), s);
+			currencies.put(CURRENCIES.BRONZE.getName(), b);
+			currencies.put(CURRENCIES.DIAMONDS.getName(), d);
+			currencies.put(CURRENCIES.PEARLS.getName(), p);
+			currencies.put(CURRENCIES.RUBIES.getName(), r);
 
-			Yerdy.getInstance().earnedCurrency(MainActivity.this, currencies);
+			Yerdy.getInstance().earnedCurrency(currencies);
 
 			updateShownBalance();
 		}
@@ -282,12 +282,12 @@ public class MainActivity extends Activity implements YerdyDelegate,
 			} else {
 
 				Map<String, Integer> currencies = new HashMap<String, Integer>();
-				currencies.put(CURRENCIES.GOLD.name(), g);
-				currencies.put(CURRENCIES.SILVER.name(), s);
-				currencies.put(CURRENCIES.BRONZE.name(), b);
-				currencies.put(CURRENCIES.DIAMONDS.name(), d);
-				currencies.put(CURRENCIES.PEARLS.name(), p);
-				currencies.put(CURRENCIES.RUBIES.name(), r);
+				currencies.put(CURRENCIES.GOLD.getName(), g);
+				currencies.put(CURRENCIES.SILVER.getName(), s);
+				currencies.put(CURRENCIES.BRONZE.getName(), b);
+				currencies.put(CURRENCIES.DIAMONDS.getName(), d);
+				currencies.put(CURRENCIES.PEARLS.getName(), p);
+				currencies.put(CURRENCIES.RUBIES.getName(), r);
 
 				Yerdy.getInstance().purchasedItem(itemName, currencies,
 						_onSale.isChecked());
@@ -411,33 +411,27 @@ public class MainActivity extends Activity implements YerdyDelegate,
 				switch (currency) {
 				case GOLD:
 					_currencyManager.add(quantity, 0, 0, 0, 0, 0);
-					Yerdy.getInstance().earnedCurrency(this,
-							CURRENCIES.GOLD.getName(), quantity);
+					Yerdy.getInstance().earnedCurrency(CURRENCIES.GOLD.getName(), quantity);
 					break;
 				case SILVER:
 					_currencyManager.add(0, quantity, 0, 0, 0, 0);
-					Yerdy.getInstance().earnedCurrency(this,
-							CURRENCIES.SILVER.getName(), quantity);
+					Yerdy.getInstance().earnedCurrency(CURRENCIES.SILVER.getName(), quantity);
 					break;
 				case BRONZE:
 					_currencyManager.add(0, 0, quantity, 0, 0, 0);
-					Yerdy.getInstance().earnedCurrency(this,
-							CURRENCIES.BRONZE.getName(), quantity);
+					Yerdy.getInstance().earnedCurrency(CURRENCIES.BRONZE.getName(), quantity);
 					break;
 				case DIAMONDS:
 					_currencyManager.add(0, 0, 0, quantity, 0, 0);
-					Yerdy.getInstance().earnedCurrency(this,
-							CURRENCIES.BRONZE.getName(), quantity);
+					Yerdy.getInstance().earnedCurrency(CURRENCIES.BRONZE.getName(), quantity);
 					break;
 				case PEARLS:
 					_currencyManager.add(0, 0, 0, 0, quantity, 0);
-					Yerdy.getInstance().earnedCurrency(this,
-							CURRENCIES.BRONZE.getName(), quantity);
+					Yerdy.getInstance().earnedCurrency(CURRENCIES.BRONZE.getName(), quantity);
 					break;
 				case RUBIES:
 					_currencyManager.add(0, 0, 0, 0, 0, quantity);
-					Yerdy.getInstance().earnedCurrency(this,
-							CURRENCIES.BRONZE.getName(), quantity);
+					Yerdy.getInstance().earnedCurrency(CURRENCIES.BRONZE.getName(), quantity);
 					break;
 				}
 			} else {

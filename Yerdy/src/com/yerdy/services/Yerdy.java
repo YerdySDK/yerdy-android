@@ -626,6 +626,38 @@ public class Yerdy {
 	}
 	
 	/**
+	 * Clamps all currencies to positive values & and logs an error if it encounters any values that it needs to clamp
+	 * @param sourceMethod Name of the method that called us (for logging purposes)
+	 * @param currencies The currencies
+	 * @return The clamped values
+	 */
+	private Map<String, Integer> validateAndClampCurrencies(String sourceMethod, Map<String, Integer> currencies) {
+		if (currencies == null)
+			return null;
+		
+		boolean needsClamping = false;
+		for (Map.Entry<String, Integer> entry : currencies.entrySet()) {
+			if (entry.getValue() < 0) {
+				YRDLog.e(this.getClass(), sourceMethod + ": Invalid amount (" + entry.getValue().toString() 
+							+ ") for currency: " + entry.getKey());
+				needsClamping = true;
+			}
+		}
+		
+		if (needsClamping) {
+			Map<String, Integer> clamped = new HashMap<String, Integer>();
+			for (Map.Entry<String, Integer> entry : currencies.entrySet()) {
+				Integer val = entry.getValue();
+				if (val < 0) val = 0;
+				clamped.put(entry.getKey(), val);
+			}
+			return clamped;
+		} else {
+			return currencies;
+		}
+	}
+	
+	/**
 	 * Tracks in-game item purchase, short version if purchase only required a single currency
 	 * @param item The name of the item
 	 * @param currency single currency name
@@ -670,6 +702,7 @@ public class Yerdy {
 	 * @category Currency
 	 */
 	public void purchasedItem(String item, Map<String, Integer> currencies, boolean onSale) {
+		currencies = validateAndClampCurrencies("purchasedItem", currencies);
 		int msgId = _conversionTracker.check(item);
 		YRDCurrencyReport report = _currencyTracker.generateCurrencyReport(currencies);
 		YRDAnalytics.getInstance().reportVirtualPurchase(_applicationContext, item, report, msgId, onSale);
@@ -720,6 +753,7 @@ public class Yerdy {
 	 * @category Currency
 	 */
 	public void purchasedInApp(YRDPurchase purchase, Map<String, Integer> currencies) {
+		currencies = validateAndClampCurrencies("purchasedInApp", currencies);
 		int msgId = _conversionTracker.check(purchase.getSku());
 		YRDCurrencyReport report = _currencyTracker.generateCurrencyReport(currencies);
 		YRDAnalytics.getInstance().reportInAppPurchase(_applicationContext, purchase, report, msgId);
@@ -728,24 +762,25 @@ public class Yerdy {
 	
 	/**
 	 * Tracks currency earned by the user.
-	 * @param context activity context
 	 * @param currency single currency name
 	 * @param amount single currency amount
-	 * @see #earnedCurrency(Context, Map) for multiple currencies
+	 * @see #earnedCurrency(Map) for multiple currencies
 	 * @category Currency
 	 */
-	public void earnedCurrency(Context context, String currency, int amount) {
-		_currencyTracker.earnedCurrencies(currency, amount);
+	public void earnedCurrency(String currency, int amount) {
+		Map<String, Integer> currencies = new HashMap<String, Integer>();
+		currencies.put(currency, amount);
+		earnedCurrency(currencies);
 	}
 	
 	/**
 	 * Tracks currency earned by the user.
-	 * @param context activity context
 	 * @param currencies mapping of currency names (String) and amounts (Integer)
-	 * @see #earnedCurrency(Context, String, int)
+	 * @see #earnedCurrency(String, int)
 	 * @category Currency
 	 */
-	public void earnedCurrency(Context context, Map<String, Integer> currencies) {
+	public void earnedCurrency(Map<String, Integer> currencies) {
+		currencies = validateAndClampCurrencies("earnedCurrency", currencies);
 		_currencyTracker.earnedCurrencies(currencies);
 	}
 	
