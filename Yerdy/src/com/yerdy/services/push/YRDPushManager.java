@@ -11,6 +11,10 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 
 import com.amazon.device.messaging.ADM;
@@ -48,10 +52,8 @@ public class YRDPushManager {
 		boolean allowADMReg = true;
 		boolean admAvailiable = false;
 
-		if (PackageManager.PERMISSION_GRANTED != cxt
-				.checkCallingOrSelfPermission(MESSAGE_PERMISSION)) {
-			YRDLog.w(YRDPushManager.class, "Missing permission: "
-					+ MESSAGE_PERMISSION);
+		if (PackageManager.PERMISSION_GRANTED != cxt.checkCallingOrSelfPermission(MESSAGE_PERMISSION)) {
+			YRDLog.w(YRDPushManager.class, "Missing permission: " + MESSAGE_PERMISSION);
 			allowGCMReg = false;
 		}
 
@@ -93,8 +95,7 @@ public class YRDPushManager {
 		if (allowADMReg)
 			runADMReg(cxt);
 
-		SharedPreferences prefs = cxt.getApplicationContext()
-				.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+		SharedPreferences prefs = cxt.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 		Editor edit = prefs.edit();
 		edit.putString(PREF_CLASS_KEY, cxt.getClass().getName());
 		edit.commit();
@@ -219,8 +220,7 @@ public class YRDPushManager {
 			notification = buildNotificationGingerbread(context, intent, icon,
 					title, message, when, defaults);
 		} else {
-			notification = buildNotificationHoneycomb(context, intent, icon,
-					title, message, when, defaults);
+			notification = buildNotificationHoneycomb(context, intent, icon, title, message, when, defaults);
 		}
 		return notification;
 	}
@@ -244,12 +244,26 @@ public class YRDPushManager {
 	private static Notification buildNotificationHoneycomb(Context context,
 			PendingIntent intent, int icon, String title, String message,
 			long when, int defaults) {
+		
 		if(icon == 0)
 			icon = android.R.drawable.ic_menu_info_details;
-		Notification notification = new Notification.Builder(context)
-				.setContentTitle(title).setContentText(message)
-				.setSmallIcon(icon).setContentIntent(intent)
-				.setAutoCancel(true).setDefaults(defaults).getNotification();
+		
+		Notification.Builder builder = new Notification.Builder(context)
+			.setContentTitle(title).setContentText(message)
+			.setSmallIcon(icon)
+			.setContentIntent(intent)
+			.setAutoCancel(true).setDefaults(defaults);
+		
+		Resources res = context.getResources();
+		int largeIconId = res.getIdentifier("notification_icon_large", "drawable", context.getPackageName());
+		if(largeIconId > 0)
+		{
+			Drawable largeDrawable = res.getDrawable(largeIconId);
+			builder.setLargeIcon(((BitmapDrawable)largeDrawable).getBitmap());
+		}
+		
+		Notification notification = builder.getNotification();
+		
 		return notification;
 	}
 

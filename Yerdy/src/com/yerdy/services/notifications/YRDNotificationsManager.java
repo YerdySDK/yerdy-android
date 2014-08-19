@@ -65,7 +65,7 @@ public class YRDNotificationsManager {
 		Context context = noteData.context;
 
 		// Prep Notification object. Use Resources instead of R,
-		// as Unity will FUCK-UP the R values
+		// as Unity will regenerate the R values, not an issue for native games
 		Resources res = context.getResources();
 		int icon = res.getIdentifier("notification_icon", "drawable", Yerdy
 				.getInstance().getAppPackage());

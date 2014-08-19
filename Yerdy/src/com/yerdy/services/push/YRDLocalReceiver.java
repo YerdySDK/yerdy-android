@@ -54,8 +54,9 @@ public class YRDLocalReceiver extends BroadcastReceiver {
 		AlarmManager am = (AlarmManager) cxt.getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(cxt, YRDLocalReceiver.class);
 		intent.putExtra(EXTRA_TITLE, title);
-		intent.putExtra(EXTRA_MESSAGE, msg);
-		intent.setAction("com.yerdy.android.services.push.gcm.GCMLocalManager");
+		intent.putExtra(EXTRA_MESSAGE, msg);		
+		
+		intent.setAction(this.getClass().getName());
 		PendingIntent pi = PendingIntent.getBroadcast(cxt, 0, intent, 0);
 
 		long when = alarmTime.getTimeInMillis();

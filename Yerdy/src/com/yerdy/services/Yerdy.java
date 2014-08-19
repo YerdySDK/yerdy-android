@@ -196,6 +196,7 @@ public class Yerdy {
 			_lvlManager.onDestroy();
 		YRDPushManager.onDestroy(_applicationContext);
 		YRDAnalytics.getInstance().appHandleDeactivate();
+		_instance = null;
 	}
 	
 	/**

@@ -18,7 +18,6 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 import com.amazon.device.messaging.ADMMessageReceiver;
 import com.yerdy.services.logging.YRDLog;
 import com.yerdy.services.push.YRDPushManager;
-import com.yerdy.services.push.gcm.GCMIntentService;
 import com.yerdy.services.push.gcm.GCMIntentService.MessageID;
 
 public class ADMIntentService extends ADMMessageHandlerBase {
@@ -65,8 +64,8 @@ public class ADMIntentService extends ADMMessageHandlerBase {
         int icon = YRDPushManager.ICON;
         if(icon == 0) {
     		// Prep native-type Notification object. Use Resources instead of R,
-    		// as Unity will FUCK-UP your R values with its own gen folder.
-        	// R works in Office games, but its preferable to let late bindings rule on any Unity Resource.
+    		// as Unity will regenerate your R values with its own gen folder.
+        	// R works in native games, but its preferable to let late bindings rule on any Unity Resource.
     		Resources res = context.getResources();
     		icon = res.getIdentifier("notification_icon", "drawable", context.getPackageName());
         }

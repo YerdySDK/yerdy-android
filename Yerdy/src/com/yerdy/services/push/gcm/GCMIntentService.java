@@ -88,8 +88,8 @@ public class GCMIntentService extends GCMBaseIntentService {
         int icon = YRDPushManager.ICON;
         if(icon == 0) {
     		// Prep native-type Notification object. Use Resources instead of R,
-    		// as Unity will FUCK-UP your R values with its own gen folder.
-        	// R works in Office games, but its preferable to let late bindings rule on any Unity Resource.
+    		// as Unity will regenerate your R values with its own gen folder.
+        	// R works in native games, but its preferable to let late bindings rule on any Unity Resource.
     		Resources res = context.getResources();
     		icon = res.getIdentifier("notification_icon", "drawable", context.getPackageName());
         }
