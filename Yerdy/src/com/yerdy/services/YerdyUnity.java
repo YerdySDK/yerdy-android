@@ -41,7 +41,7 @@ public class YerdyUnity {
 		YRDLog.i(YerdyUnity.class, "onPause");
 		Yerdy.getInstance().onPause();
 	}
-	
+		
 	//Prime31 Activity Sharing plug-in doesn't appear to be correctly calling onWindowFocusChanged with current version.
 	//Renamed to _name and removed static declaration until plug-in properly calls function and unity layer can be bypassed
 	public void _onWindowFocusChanged(boolean hasFocus) {
@@ -61,6 +61,10 @@ public class YerdyUnity {
 	public static void onBackPressed() {
 		YRDLog.i(YerdyUnity.class, "onBackPressed");
 	}
+	
+	// 'static' because a new instance of YerdyUnity is created on every call across the Unity <-> Java bridge
+	private static boolean _shouldShowAnotherMessageAfterUserCancel;
+	
 	
 	public void startWithPublisherKey(String publisherKey) {
 		YRDLog.i(YerdyUnity.class, "startWithPublisherKey");
@@ -129,6 +133,16 @@ public class YerdyUnity {
 		Yerdy.getInstance().dismissMessage();
 	}
 	
+	public void setShouldShowAnotherMessageAfterUserCancel(boolean value) {
+		YRDLog.i(YerdyUnity.class, "setShouldShowAnotherMessageAfterUserCancel:" + value);
+		_shouldShowAnotherMessageAfterUserCancel = value;
+	}
+	
+	public boolean getShouldShowAnotherMessageAfterUserCancel() {
+		YRDLog.i(YerdyUnity.class, "getShouldShowAnotherMessageAfterUserCancel:" + _shouldShowAnotherMessageAfterUserCancel);
+		return _shouldShowAnotherMessageAfterUserCancel;
+	}
+	
 	public boolean getIsPremiumUser() {
 		YRDLog.i(YerdyUnity.class, "getIsPremiumUser");
 		return Yerdy.getInstance().getIsPremiumUser(getRootActivity());
@@ -184,8 +198,7 @@ public class YerdyUnity {
 		
 		@Override
 		public boolean shouldShowAnotherMessageAfterUserCancelForPlacement(String placement) {
-			//TODO: Implement proper handling of this in Unity plugin
-			return false;
+			return _shouldShowAnotherMessageAfterUserCancel;
 		}
 		
 		@Override
