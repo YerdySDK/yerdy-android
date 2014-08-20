@@ -150,7 +150,7 @@ public class YerdyUnity {
 	
 	public void startPlayerProgression(String category, String milestone) {
 		YRDLog.i(YerdyUnity.class, "startPlayerProgression:"+category+","+milestone);
-		Yerdy.getInstance().logPlayerProgression(category, milestone);
+		Yerdy.getInstance().startPlayerProgression(category, milestone);
 	}
 	
 	public void logPlayerProgression(String category, String milestone) {

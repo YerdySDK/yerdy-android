@@ -61,7 +61,7 @@ public class YRDProgressionTracker {
 	
 	// startProgression/trackProgression do some sanity checks/validation, then call this method to write the event
 	private void storeProgression(String group, String event, int launches, long playtime) {
-		event = "_" + event; // to coerce it to a string for the services
+		String servicesEventName = "_" + event; // to coerce it to a string for the services
 		
 		// update counters
 		JSONObject groupJson = _tracked.optJSONObject(group);
@@ -69,12 +69,12 @@ public class YRDProgressionTracker {
 		if(groupJson != null) {
 			try
 			{
-				JSONObject data = groupJson.optJSONObject(event);
-				groupJson.put(event, (data != null)?(updateData(data, launches, playtime)):(createData(launches, playtime)));
+				JSONObject data = groupJson.optJSONObject(servicesEventName);
+				groupJson.put(servicesEventName, (data != null)?(updateData(data, launches, playtime)):(createData(launches, playtime)));
 			} catch (Exception e) { }
 		} else {
 			try {
-				_tracked.put(group, createGroup(event, launches, playtime));
+				_tracked.put(group, createGroup(servicesEventName, launches, playtime));
 			} catch (JSONException e) {
 				YRDLog.w(getClass(), "Failed to store progression event");
 			}
