@@ -1,0 +1,6 @@
+package com.yerdy.Sample;
+
+public final class PublisherKey {
+	//  You can visit http://dashboard.yerdy.com/ to get your publisher key
+	public static final String PUBLISHER_KEY = "<paste your publisher key here>";
+}

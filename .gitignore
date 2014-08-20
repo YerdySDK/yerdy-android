@@ -1,3 +1,9 @@
+###### Project specific ignores
+
+YerdySample/src/com/yerdy/Sample/PublisherKey.java
+
+###### Generic ignores
+
 .DS_Store
 .AppleDouble
 .LSOverride

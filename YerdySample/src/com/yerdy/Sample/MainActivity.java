@@ -43,7 +43,6 @@ public class MainActivity extends Activity implements YerdyDelegate,
 		YerdyMessageDelegate {
 
 	// You can get your publisher key from the Yerdy Dashboard
-	private final String PUBLISHER_KEY = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	Random randoms = new Random();
 	private final String adNetworkName = "FakeAd";
 	private CurrencyManager _currencyManager;
@@ -84,7 +83,12 @@ public class MainActivity extends Activity implements YerdyDelegate,
 						CURRENCIES.DIAMONDS.getName(),
 						CURRENCIES.PEARLS.getName(),
 						CURRENCIES.RUBIES.getName() });
-		Yerdy.getInstance().startWithPublisherKey(this, PUBLISHER_KEY);
+		
+		// To setup the publisher key for the sample project:
+		//	In the "YerdySample/src/com/yerdy/Sample/" directory, copy PublisherKey.java.sample
+		// 	to PublisherKey.java & update it with your publisher key.  You can visit
+		// 	http://dashboard.yerdy.com to register & get your publisher key
+		Yerdy.getInstance().startWithPublisherKey(this, PublisherKey.PUBLISHER_KEY);
 		Yerdy.getInstance().logScreenVisit("main");
 	}
 
@@ -401,7 +405,7 @@ public class MainActivity extends Activity implements YerdyDelegate,
 	
 	@Override
 	public boolean shouldShowAnotherMessageAfterUserCancelForPlacement(String placement) {
-		return true;
+		return false;
 	}
 
 	@Override
