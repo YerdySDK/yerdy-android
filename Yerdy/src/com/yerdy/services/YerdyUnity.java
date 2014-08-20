@@ -148,8 +148,13 @@ public class YerdyUnity {
 		return Yerdy.getInstance().getIsPremiumUser(getRootActivity());
 	}
 	
-	public void playerProgression(String category, String milestone) {
-		YRDLog.i(YerdyUnity.class, "playerProgression:"+category+","+milestone);
+	public void startPlayerProgression(String category, String milestone) {
+		YRDLog.i(YerdyUnity.class, "startPlayerProgression:"+category+","+milestone);
+		Yerdy.getInstance().logPlayerProgression(category, milestone);
+	}
+	
+	public void logPlayerProgression(String category, String milestone) {
+		YRDLog.i(YerdyUnity.class, "logPlayerProgression:"+category+","+milestone);
 		Yerdy.getInstance().logPlayerProgression(category, milestone);
 	}
 	
