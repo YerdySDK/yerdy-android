@@ -39,6 +39,13 @@ abstract public class YRDService extends IntentService {
 	private static final String EXTRA_CLIENT = "extra_client";
 	private static final String CRYPTO_ALG = "HmacSHA1";
 	private static final String CRYPTO_ENC = "UTF-8";
+	
+	// Base URL should end in '/'
+	// 	Production server: http://services.yerdy.com/
+	// 	Internal test server:  http://10.189.165.237/~michal/
+	// 	Klaus test server: http://10.189.165.104/~krubba/FluikServices/httpdocs/
+	// 	Klaus test server (Mac mini): http://10.189.165.234/~user/FluikServices/httpdocs/
+	// 	Darren test server: http://10.189.165.207/~darrenclark/FluikServices/httpdocs/
 	private static final String ROOT = "http://services.yerdy.com/";
 	
 	public YRDService() {

@@ -61,7 +61,8 @@ public class YRDPersistence implements Serializable {
 		IS_PRE_YERDY_USER,
 		TRACK_PRE_YERDY_USER,
 		ADS_VERSIONED,
-		HISTORY_ITEMS;
+		HISTORY_ITEMS,
+		UNPUSHED_VIRTUAL_PURCHASES;
 
 		@Override
 		public int length() {
@@ -179,6 +180,22 @@ public class YRDPersistence implements Serializable {
 			}
 		}
 		return new JSONObject();
+	}
+	
+	public void setJSONArray(CharSequence key, JSONArray value) {
+		editor.putString(key.toString(), value.toString());
+	}
+	
+	public JSONArray getJSONArray(CharSequence key) {
+		String jsonStr = preferences.getString(key.toString(), null);
+		if(jsonStr != null) {
+			try {
+				return new JSONArray(jsonStr);
+			} catch (Exception e) {
+				//Do nothing on error
+			}
+		}
+		return new JSONArray();
 	}
 
 	public void clear() {

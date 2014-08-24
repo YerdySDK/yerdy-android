@@ -46,6 +46,25 @@ public final class JSONUtil {
 	}
 	
 	/*
+	 * Creates a new JSONArray with the object at the given index removed
+	 */
+	public static JSONArray removeAtIndex(JSONArray array, int index) {
+		JSONArray retVal = new JSONArray();
+		try
+		{
+			for (int i = 0; i < array.length(); i++) {
+				if (i != index)
+					retVal.put(array.get(i));
+			}
+		}
+		catch (JSONException ex)
+		{
+			YRDLog.e(JSONUtil.class, "Exception in removeAtIndex");
+		}
+		return retVal;
+	}
+	
+	/*
 	 * Creates a new JSONArray by concatenating the 2 provided JSONArrays
 	 */
 	public static JSONArray concat(JSONArray first, JSONArray last) {

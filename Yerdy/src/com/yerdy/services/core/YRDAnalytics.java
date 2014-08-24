@@ -32,6 +32,7 @@ import com.yerdy.services.purchases.YRDReportIAPClient;
 import com.yerdy.services.purchases.YRDReportIAPService;
 import com.yerdy.services.purchases.YRDReportVirtualPurchaseClient;
 import com.yerdy.services.purchases.YRDReportVirtualPurchaseService;
+import com.yerdy.services.util.JSONUtil;
 import com.yerdy.services.util.YerdyUtil;
 
 public class YRDAnalytics {
@@ -224,11 +225,6 @@ public class YRDAnalytics {
 			keychainData.save();
 		}
 		
-		int count = keychainData.getValue(AnalyticKey.VIRTUAL_PURCHASE_COUNT_TIMED, 0);
-		keychainData.setValue(AnalyticKey.VIRTUAL_PURCHASE_COUNT_TIMED, count + 1);
-		itemPurchased();
-		keychainData.save();
-		
 		VirtualPurchaseData data = new VirtualPurchaseData(
 				itemIdentifier,
 				report.getTransactionAmount(), 
@@ -237,10 +233,32 @@ public class YRDAnalytics {
 				messageId,
 				onSale);
 
-		uploadVirtualPurchase(cxt, data);
+		// if we have internet, submit right away.  otherwise, cache it for later.
+		if (!YerdyUtil.networkUnreachable(cxt)) {
+			uploadVirtualPurchase(cxt, data, new MetaSaveVirtaulPurchaseClient());
+		} else {
+			YRDLog.i(getClass(), "Saving virtual purchase for reporting later");
+			JSONArray unpushedVirtual = keychainData.getJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES);
+			try
+			{
+				unpushedVirtual.put(data.toJSON());
+				keychainData.setJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES, unpushedVirtual);
+				keychainData.save();
+			}
+			catch (JSONException ex)
+			{
+				YRDLog.e(getClass(), "Failed to add cached virtual purchase");
+				ex.printStackTrace();
+			}
+		}
+		
+		int count = keychainData.getValue(AnalyticKey.VIRTUAL_PURCHASE_COUNT_TIMED, 0);
+		keychainData.setValue(AnalyticKey.VIRTUAL_PURCHASE_COUNT_TIMED, count + 1);
+		itemPurchased();
+		keychainData.save();
 	}
 	
-	private void uploadVirtualPurchase(Context ctx, VirtualPurchaseData purchaseData) {
+	private void uploadVirtualPurchase(Context ctx, VirtualPurchaseData purchaseData, YRDReportVirtualPurchaseClient client) {
 		YRDReportVirtualPurchaseService purchaseService = new YRDReportVirtualPurchaseService();		
 		purchaseService.reportVirtualPurchase(ctx, 
 				purchaseData.getItemIdentifier(),
@@ -249,7 +267,7 @@ public class YRDAnalytics {
 				purchaseData.getPostIapIndex(), 
 				purchaseData.getMessageId(), 
 				purchaseData.getOnSale(),
-				new MetaSaveVirtaulPurchaseClient());
+				client);
 	}
 	
 	public void reportInAppPurchase(Context context, YRDPurchase purchase, YRDCurrencyReport currencyReport, int messageId, YRDHistoryTracker historyTracker) {
@@ -318,10 +336,40 @@ public class YRDAnalytics {
 
 		reportLaunch(cxt, currencyReport, adReport, false);
 		uploadIfNeeded(cxt);
+		submitCachedVGPIfNeeded(cxt);
 
 		currentTry = minTry;
 		keychainData.save();
 		return true;
+	}
+	
+	private void submitCachedVGPIfNeeded(Context ctx) {
+		JSONArray unpushed = keychainData.getJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES);
+		if (unpushed.length() == 0 || YerdyUtil.networkUnreachable(ctx))
+			return;
+		
+		VirtualPurchaseData toSubmit = null;
+		
+		try
+		{
+			JSONObject firstUnpushedJSON = unpushed.optJSONObject(0);
+			if (firstUnpushedJSON == null)
+				return;
+			toSubmit = VirtualPurchaseData.fromJSON(firstUnpushedJSON);
+			
+			unpushed = JSONUtil.removeAtIndex(unpushed, 0);
+			keychainData.setJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES, unpushed);
+			keychainData.save();
+		}
+		catch (JSONException ex)
+		{
+			YRDLog.e(getClass(), "Failed to get unpushed virtual purchase from JSON");
+			ex.printStackTrace();
+		}
+		
+		if (toSubmit != null) {
+			uploadVirtualPurchase(ctx, toSubmit, new CachedSaveVirtualPurchaseClient(ctx));
+		}
 	}
 
 	public void uploadIfNeeded(Context cxt) {
@@ -533,6 +581,7 @@ public class YRDAnalytics {
 		}
 	}
 
+	// used when submitting a virtual purchase right away
 	class MetaSaveVirtaulPurchaseClient extends YRDReportVirtualPurchaseClient {
 
 		@Override
@@ -543,6 +592,26 @@ public class YRDAnalytics {
 		@Override
 		public void saveVirtualPurchaseServiceSucceeded(int resultCode) {
 			// iOS doesn't handle these, so neither does Android
+		}
+	}
+	
+	// used when uploading a bunch of cached virtual purchases
+	class CachedSaveVirtualPurchaseClient extends YRDReportVirtualPurchaseClient {
+		private Context context;
+		public CachedSaveVirtualPurchaseClient(Context ctx) {
+			context = ctx.getApplicationContext();
+		}
+		
+		@Override
+		public void saveVirtualPurchaseServiceFailed(Exception error, int resultCode) {
+			YRDLog.d(getClass(), "saveVirtualPurchaseServiceFailed");
+			submitCachedVGPIfNeeded(context);
+		}
+
+		@Override
+		public void saveVirtualPurchaseServiceSucceeded(int resultCode) {
+			YRDLog.d(getClass(), "saveVirtualPurchaseServiceSucceeded");
+			submitCachedVGPIfNeeded(context);
 		}
 	}
 
