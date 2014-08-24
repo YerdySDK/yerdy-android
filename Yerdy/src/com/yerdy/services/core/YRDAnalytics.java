@@ -186,7 +186,7 @@ public class YRDAnalytics {
 		keychainData.save();
 		_screenVisits = new JSONObject();
 		
-		MetaLaunchClient client = new MetaLaunchClient();
+		MetaLaunchClient client = new MetaLaunchClient(cxt);
 		client.setAdPerformance(adReport);
 		client.setScreenVisits(loggedScreenVisits);
 		client.setIsRefresh(isRefresh);
@@ -336,7 +336,6 @@ public class YRDAnalytics {
 
 		reportLaunch(cxt, currencyReport, adReport, false);
 		uploadIfNeeded(cxt);
-		submitCachedVGPIfNeeded(cxt);
 
 		currentTry = minTry;
 		keychainData.save();
@@ -457,12 +456,19 @@ public class YRDAnalytics {
 	
 	class MetaLaunchClient extends YRDLaunchClient {
 		private boolean _isRefresh = false;
+		private Context _ctx = null;
+		
+		public MetaLaunchClient(Context ctx) {
+			_ctx = ctx.getApplicationContext();
+		}
 		
 		@Override
 		public void launchReported() {
 			if(_isRefresh) {
 				return;
 			}
+			
+			submitCachedVGPIfNeeded(_ctx);
 			
 			if (null != launchClient) {
 				launchClient.launchReported();
