@@ -62,7 +62,9 @@ public class YRDPersistence implements Serializable {
 		TRACK_PRE_YERDY_USER,
 		ADS_VERSIONED,
 		HISTORY_ITEMS,
-		UNPUSHED_VIRTUAL_PURCHASES;
+		UNPUSHED_VIRTUAL_PURCHASES, // virtual purchases cached locally for submission next time we're online
+		PENDING_VIRTUAL_PURCHASES, // virtual purchases on hold due to validating first IAP
+		PURCHASE_VALIDATION_STATE; // see YRDAnalytics.ValidationState
 
 		@Override
 		public int length() {
