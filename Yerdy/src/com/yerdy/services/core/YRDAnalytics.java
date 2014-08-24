@@ -24,6 +24,7 @@ import com.yerdy.services.launch.YRDUserInfo;
 import com.yerdy.services.launch.YRDUserType;
 import com.yerdy.services.logging.YRDLog;
 import com.yerdy.services.purchases.PurchaseData;
+import com.yerdy.services.purchases.VirtualPurchaseData;
 import com.yerdy.services.purchases.YRDCurrencyReport;
 import com.yerdy.services.purchases.YRDHistoryTracker;
 import com.yerdy.services.purchases.YRDPurchase;
@@ -31,6 +32,7 @@ import com.yerdy.services.purchases.YRDReportIAPClient;
 import com.yerdy.services.purchases.YRDReportIAPService;
 import com.yerdy.services.purchases.YRDReportVirtualPurchaseClient;
 import com.yerdy.services.purchases.YRDReportVirtualPurchaseService;
+import com.yerdy.services.util.JSONUtil;
 import com.yerdy.services.util.YerdyUtil;
 
 public class YRDAnalytics {
@@ -41,6 +43,21 @@ public class YRDAnalytics {
 
 	YRDReportIAPService currentSaveService;
 
+	// Synchronized to disk - DO NOT CHANGE EXISTING ENUM VALUES
+	private enum ValidationState {
+		DEFAULT(0),  // never submitted a purchase
+		PENDING(1),  // submitted a purchase, waiting for it to be validated
+		VALIDATED(2);  // user has validated at least 1 purchase
+		
+		private final int idx;
+		private ValidationState(int idx) {
+			this.idx = idx;
+		}
+		public int idx() {
+			return idx;
+		}
+	}
+	
 	//Looks like in certain situations stop may fire before start thus value was 0 which is incorrect
 	private long appStart = -1;
 	private boolean _activated = false;
@@ -184,7 +201,7 @@ public class YRDAnalytics {
 		keychainData.save();
 		_screenVisits = new JSONObject();
 		
-		MetaLaunchClient client = new MetaLaunchClient();
+		MetaLaunchClient client = new MetaLaunchClient(cxt);
 		client.setAdPerformance(adReport);
 		client.setScreenVisits(loggedScreenVisits);
 		client.setIsRefresh(isRefresh);
@@ -209,8 +226,7 @@ public class YRDAnalytics {
 	public void reportVirtualPurchase(Context cxt, String itemIdentifier, YRDCurrencyReport report, int messageId, boolean onSale) {
 		updatePlaytime();
 
-		YRDReportVirtualPurchaseService purchaseService = new YRDReportVirtualPurchaseService();
-
+		
 		boolean firstPurchase = keychainData.getValue(AnalyticKey.REPORT_FIRST_PURCHASE, true);
 		int postIapIndex = keychainData.getValue(AnalyticKey.POST_IAP_INDEX, 0);
 
@@ -223,15 +239,72 @@ public class YRDAnalytics {
 			keychainData.setValue(AnalyticKey.POST_IAP_INDEX, (postIapIndex + 1));
 			keychainData.save();
 		}
-		
+
 		int count = keychainData.getValue(AnalyticKey.VIRTUAL_PURCHASE_COUNT_TIMED, 0);
 		keychainData.setValue(AnalyticKey.VIRTUAL_PURCHASE_COUNT_TIMED, count + 1);
 		itemPurchased();
 		keychainData.save();
 		
-		purchaseService.reportVirtualPurchase(cxt, itemIdentifier, report, firstPurchase, postIapIndex, messageId, onSale,
-				new MetaSaveVirtaulPurchaseClient());
-
+		
+		VirtualPurchaseData data = new VirtualPurchaseData(
+				itemIdentifier,
+				report.getTransactionAmount(), 
+				firstPurchase,
+				postIapIndex,
+				messageId,
+				onSale);
+		
+		int validationState = keychainData.getValue(AnalyticKey.PURCHASE_VALIDATION_STATE, ValidationState.DEFAULT.idx());
+		// if we are in the middle of validating the first purchase, hold off on submitting
+		if (validationState != ValidationState.PENDING.idx()) {
+			// not validating the first purchase - submit now
+			
+			// if we have internet, submit right away.  otherwise, cache it for later.
+			if (!YerdyUtil.networkUnreachable(cxt)) {
+				uploadVirtualPurchase(cxt, data, new MetaSaveVirtaulPurchaseClient());
+			} else {
+				YRDLog.i(getClass(), "Saving virtual purchase for reporting later");
+				JSONArray unpushedVirtual = keychainData.getJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES);
+				try
+				{
+					unpushedVirtual.put(data.toJSON());
+					keychainData.setJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES, unpushedVirtual);
+					keychainData.save();
+				}
+				catch (JSONException ex)
+				{
+					YRDLog.e(getClass(), "Failed to add cached virtual purchase");
+					ex.printStackTrace();
+				}
+			}
+		} else {
+			// validating first purchase - hold for later
+			YRDLog.i(getClass(), "Saving virtual purchase for reporting later (first IAP is currently being validated)");
+			JSONArray pendingVirtual = keychainData.getJSONArray(AnalyticKey.PENDING_VIRTUAL_PURCHASES);
+			try
+			{
+				pendingVirtual.put(data.toJSON());
+				keychainData.setJSONArray(AnalyticKey.PENDING_VIRTUAL_PURCHASES, pendingVirtual);
+				keychainData.save();
+			}
+			catch (JSONException ex)
+			{
+				YRDLog.e(getClass(), "Failed to add pending virtual purchase");
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	private void uploadVirtualPurchase(Context ctx, VirtualPurchaseData purchaseData, YRDReportVirtualPurchaseClient client) {
+		YRDReportVirtualPurchaseService purchaseService = new YRDReportVirtualPurchaseService();		
+		purchaseService.reportVirtualPurchase(ctx, 
+				purchaseData.getItemIdentifier(),
+				purchaseData.getTransactionAmount(), 
+				purchaseData.getFirstPurchase(),
+				purchaseData.getPostIapIndex(), 
+				purchaseData.getMessageId(), 
+				purchaseData.getOnSale(),
+				client);
 	}
 	
 	public void reportInAppPurchase(Context context, YRDPurchase purchase, YRDCurrencyReport currencyReport, int messageId, YRDHistoryTracker historyTracker) {
@@ -256,6 +329,15 @@ public class YRDAnalytics {
 
 		values.add(purchaseData);
 		writePurchasesToReport(values);
+		
+		// if they've never made an IAP before, move them over to the 'pending' state (where we hold any future
+		// virtual purchases until they move to the 'validated' state
+		int validationState = keychainData.getValue(AnalyticKey.PURCHASE_VALIDATION_STATE, ValidationState.DEFAULT.idx());
+		if (validationState == ValidationState.DEFAULT.idx()) {
+			keychainData.setValue(AnalyticKey.PURCHASE_VALIDATION_STATE, ValidationState.PENDING.idx());
+			keychainData.save();
+		}
+		
 		uploadIfNeeded(context);
 	}
 
@@ -304,6 +386,35 @@ public class YRDAnalytics {
 		currentTry = minTry;
 		keychainData.save();
 		return true;
+	}
+	
+	private void submitCachedVGPIfNeeded(Context ctx) {
+		JSONArray unpushed = keychainData.getJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES);
+		if (unpushed.length() == 0 || YerdyUtil.networkUnreachable(ctx))
+			return;
+		
+		VirtualPurchaseData toSubmit = null;
+		
+		try
+		{
+			JSONObject firstUnpushedJSON = unpushed.optJSONObject(0);
+			if (firstUnpushedJSON == null)
+				return;
+			toSubmit = VirtualPurchaseData.fromJSON(firstUnpushedJSON);
+			
+			unpushed = JSONUtil.removeAtIndex(unpushed, 0);
+			keychainData.setJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES, unpushed);
+			keychainData.save();
+		}
+		catch (JSONException ex)
+		{
+			YRDLog.e(getClass(), "Failed to get unpushed virtual purchase from JSON");
+			ex.printStackTrace();
+		}
+		
+		if (toSubmit != null) {
+			uploadVirtualPurchase(ctx, toSubmit, new CachedSaveVirtualPurchaseClient(ctx));
+		}
 	}
 
 	public void uploadIfNeeded(Context cxt) {
@@ -391,12 +502,19 @@ public class YRDAnalytics {
 	
 	class MetaLaunchClient extends YRDLaunchClient {
 		private boolean _isRefresh = false;
+		private Context _ctx = null;
+		
+		public MetaLaunchClient(Context ctx) {
+			_ctx = ctx.getApplicationContext();
+		}
 		
 		@Override
 		public void launchReported() {
 			if(_isRefresh) {
 				return;
 			}
+			
+			submitCachedVGPIfNeeded(_ctx);
 			
 			if (null != launchClient) {
 				launchClient.launchReported();
@@ -449,6 +567,54 @@ public class YRDAnalytics {
 			// respectively
 			keychainData.setValue(AnalyticKey.POST_IAP_INDEX, 1);
 			keychainData.save();
+			
+			int validationState = keychainData.getValue(AnalyticKey.PURCHASE_VALIDATION_STATE, ValidationState.DEFAULT.idx());
+			if (validationState == ValidationState.PENDING.idx()) {
+				try {
+					// update user to VALIDATED
+					validationState = ValidationState.VALIDATED.idx();
+					keychainData.setValue(AnalyticKey.PURCHASE_VALIDATION_STATE, ValidationState.VALIDATED.idx());
+					
+					// update postIapIndex on all pending virtual purchases
+					JSONArray pending = keychainData.getJSONArray(AnalyticKey.PENDING_VIRTUAL_PURCHASES);
+					
+					int postIapIndex = 1;
+					JSONArray processed = new JSONArray();
+					for (int i = 0; i < pending.length(); i++) {
+						JSONObject jsonObj = pending.optJSONObject(i);
+						if (jsonObj == null)
+							continue;
+						
+						try {
+							VirtualPurchaseData vpData = VirtualPurchaseData.fromJSON(jsonObj);
+							vpData.setPostIapIndex(postIapIndex);
+							postIapIndex++;
+							processed.put(vpData.toJSON());
+						} catch (JSONException ex) { 
+							YRDLog.e(getClass(), "Error processing pending VGP");
+							ex.printStackTrace();
+						}
+					}
+					
+					// update POST_IAP_INDEX after adjusting the pending purchases
+					keychainData.setValue(AnalyticKey.POST_IAP_INDEX, postIapIndex);
+					
+					// add all updated VGP to UNPUSHED_VIRTUAL_PURCHASES
+					JSONArray unpushed = keychainData.getJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES);
+					keychainData.setJSONArray(AnalyticKey.UNPUSHED_VIRTUAL_PURCHASES, JSONUtil.concat(unpushed, processed));
+					
+					// clear pending virtual purchases
+					keychainData.setJSONArray(AnalyticKey.PENDING_VIRTUAL_PURCHASES, new JSONArray());
+					
+					keychainData.save();
+					
+					// send off VGP to server
+					submitCachedVGPIfNeeded(_cxt);
+				} catch (Exception ex) {
+					YRDLog.e(getClass(), "Error updating user from PENDING -> VALIDATED");
+					ex.printStackTrace();
+				}
+			}
 
 			List<PurchaseData> values = getPurchasesToReport();
 			if (values.remove(getPurchaseData())) {
@@ -515,6 +681,7 @@ public class YRDAnalytics {
 		}
 	}
 
+	// used when submitting a virtual purchase right away
 	class MetaSaveVirtaulPurchaseClient extends YRDReportVirtualPurchaseClient {
 
 		@Override
@@ -525,6 +692,26 @@ public class YRDAnalytics {
 		@Override
 		public void saveVirtualPurchaseServiceSucceeded(int resultCode) {
 			// iOS doesn't handle these, so neither does Android
+		}
+	}
+	
+	// used when uploading a bunch of cached virtual purchases
+	class CachedSaveVirtualPurchaseClient extends YRDReportVirtualPurchaseClient {
+		private Context context;
+		public CachedSaveVirtualPurchaseClient(Context ctx) {
+			context = ctx.getApplicationContext();
+		}
+		
+		@Override
+		public void saveVirtualPurchaseServiceFailed(Exception error, int resultCode) {
+			YRDLog.d(getClass(), "saveVirtualPurchaseServiceFailed");
+			submitCachedVGPIfNeeded(context);
+		}
+
+		@Override
+		public void saveVirtualPurchaseServiceSucceeded(int resultCode) {
+			YRDLog.d(getClass(), "saveVirtualPurchaseServiceSucceeded");
+			submitCachedVGPIfNeeded(context);
 		}
 	}
 

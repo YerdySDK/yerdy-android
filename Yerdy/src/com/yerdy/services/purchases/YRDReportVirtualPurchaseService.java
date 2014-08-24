@@ -31,7 +31,7 @@ public class YRDReportVirtualPurchaseService extends YRDService {
 	 *            flag indicating this is user's first time spending money
 	 * @see 
 	 */
-	public void reportVirtualPurchase(Context cxt, String itemIdentifier, YRDCurrencyReport currencyReport, boolean isFirstPurchase, int postIapIndex,
+	public void reportVirtualPurchase(Context cxt, String itemIdentifier, String transactionAmount, boolean isFirstPurchase, int postIapIndex,
 					int messageId, boolean onSale, YRDReportVirtualPurchaseClient client) {
 
 		Uri.Builder builder = getStandardURIBuilder(cxt);
@@ -42,7 +42,7 @@ public class YRDReportVirtualPurchaseService extends YRDService {
 		builder.appendQueryParameter("v", Yerdy.getInstance().getAppVersion());
 		builder.appendQueryParameter("itemid", itemIdentifier);
 
-		builder.appendQueryParameter("currency", currencyReport.getTransactionAmount());
+		builder.appendQueryParameter("currency", transactionAmount);
 		builder.appendQueryParameter("fmt", "json");
 		if (isFirstPurchase) {
 			builder.appendQueryParameter("first", "1");

@@ -1,13 +1,16 @@
 package com.yerdy.services.core;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URI;
+import java.net.UnknownHostException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -39,6 +42,13 @@ abstract public class YRDService extends IntentService {
 	private static final String EXTRA_CLIENT = "extra_client";
 	private static final String CRYPTO_ALG = "HmacSHA1";
 	private static final String CRYPTO_ENC = "UTF-8";
+	
+	// Base URL should end in '/'
+	// 	Production server: http://services.yerdy.com/
+	// 	Internal test server:  http://10.189.165.237/~michal/
+	// 	Klaus test server: http://10.189.165.104/~krubba/FluikServices/httpdocs/
+	// 	Klaus test server (Mac mini): http://10.189.165.234/~user/FluikServices/httpdocs/
+	// 	Darren test server: http://10.189.165.207/~darrenclark/FluikServices/httpdocs/
 	private static final String ROOT = "http://services.yerdy.com/";
 	
 	public YRDService() {
@@ -76,16 +86,27 @@ abstract public class YRDService extends IntentService {
 			conn = prepConnection(client, new URI(androidUri.toString()));
 			responseCode = conn.getResponseCode();
 		} catch (Exception e) {
-			// Network retry
-			if (attempt < 3) {
+			// Network retry 
+			// (ONLY if we fail to connect.  If we fail to receive the response,
+			// we shouldn't retry so that we don't double/triple up stats on the server)
+			boolean shouldRetry = (e instanceof UnknownHostException  // couldn't resolve DNS
+					|| e instanceof SocketException  // couldn't connect
+					// EOFException - due to bug in Android, something with recycling connections.
+					// verified (via server access logs) that the request DOES NOT make it to the 
+					// server, so it is safe to retry
+					|| e instanceof EOFException);
+			
+			if (shouldRetry && attempt < 3) {
 				try {
-					e.printStackTrace();
 					Thread.sleep(500);
 				} catch (InterruptedException e1) {
 
 				}
 				onHandleIntentAttempt(intent, (attempt + 1));
 				return;
+			} else if (!shouldRetry) {
+				YRDLog.e(getClass(), "Unexpected exception: ");
+				e.printStackTrace();
 			}
 		}
 
