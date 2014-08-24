@@ -24,6 +24,7 @@ import com.yerdy.services.launch.YRDUserInfo;
 import com.yerdy.services.launch.YRDUserType;
 import com.yerdy.services.logging.YRDLog;
 import com.yerdy.services.purchases.PurchaseData;
+import com.yerdy.services.purchases.VirtualPurchaseData;
 import com.yerdy.services.purchases.YRDCurrencyReport;
 import com.yerdy.services.purchases.YRDHistoryTracker;
 import com.yerdy.services.purchases.YRDPurchase;
@@ -209,8 +210,7 @@ public class YRDAnalytics {
 	public void reportVirtualPurchase(Context cxt, String itemIdentifier, YRDCurrencyReport report, int messageId, boolean onSale) {
 		updatePlaytime();
 
-		YRDReportVirtualPurchaseService purchaseService = new YRDReportVirtualPurchaseService();
-
+		
 		boolean firstPurchase = keychainData.getValue(AnalyticKey.REPORT_FIRST_PURCHASE, true);
 		int postIapIndex = keychainData.getValue(AnalyticKey.POST_IAP_INDEX, 0);
 
@@ -229,9 +229,27 @@ public class YRDAnalytics {
 		itemPurchased();
 		keychainData.save();
 		
-		purchaseService.reportVirtualPurchase(cxt, itemIdentifier, report.getTransactionAmount(), firstPurchase, postIapIndex, messageId, onSale,
-				new MetaSaveVirtaulPurchaseClient());
+		VirtualPurchaseData data = new VirtualPurchaseData(
+				itemIdentifier,
+				report.getTransactionAmount(), 
+				firstPurchase,
+				postIapIndex,
+				messageId,
+				onSale);
 
+		uploadVirtualPurchase(cxt, data);
+	}
+	
+	private void uploadVirtualPurchase(Context ctx, VirtualPurchaseData purchaseData) {
+		YRDReportVirtualPurchaseService purchaseService = new YRDReportVirtualPurchaseService();		
+		purchaseService.reportVirtualPurchase(ctx, 
+				purchaseData.getItemIdentifier(),
+				purchaseData.getTransactionAmount(), 
+				purchaseData.getFirstPurchase(),
+				purchaseData.getPostIapIndex(), 
+				purchaseData.getMessageId(), 
+				purchaseData.getOnSale(),
+				new MetaSaveVirtaulPurchaseClient());
 	}
 	
 	public void reportInAppPurchase(Context context, YRDPurchase purchase, YRDCurrencyReport currencyReport, int messageId, YRDHistoryTracker historyTracker) {
