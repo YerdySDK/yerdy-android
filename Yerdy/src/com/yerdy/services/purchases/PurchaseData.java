@@ -4,6 +4,11 @@ import java.io.Serializable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
+
+import com.yerdy.services.util.JSONUtil;
+
+import java.util.*;
 
 public class PurchaseData implements Serializable {
 
@@ -40,6 +45,11 @@ public class PurchaseData implements Serializable {
 	private int _msgId = -1;
 	private boolean _isValid = false;
 	private boolean _onSale = false;
+	private JSONArray _lastScreenVisits;
+	private JSONArray _lastItemPurchases;
+	private JSONArray _lastMessages;
+	private JSONArray _lastPlayerProgressionCategories;
+	private JSONArray _lastPlayerProgressionMilestones;
 
 	public PurchaseData(YRDPurchase purchase, YRDCurrencyReport currencyReport) {
 		if(purchase != null && purchase.getSku() != null && purchase.getSku().length() > 0) {
@@ -196,6 +206,46 @@ public class PurchaseData implements Serializable {
 	public void setMessageId(int msgId) {
 		this._msgId = msgId;
 	}
+	
+	public void setLastScreenVisits(List<String> lastScreenVisits) {
+		_lastScreenVisits = new JSONArray(lastScreenVisits);
+	}
+	
+	public void setLastItemPurchases(List<String> lastItemPurchases) {
+		_lastItemPurchases = new JSONArray(lastItemPurchases);
+	}
+	
+	public void setLastMessages(List<String> lastMessages) {
+		_lastMessages = new JSONArray(lastMessages);
+	}
+	
+	public void setLastPlayerProgressionCategories(List<String> lastPlayerProgressionCategories) {
+		_lastPlayerProgressionCategories = new JSONArray(lastPlayerProgressionCategories);
+	}
+	
+	public void setLastPlayerProgressionMilestones(List<String> lastPlayerProgressionMilestones) {
+		_lastPlayerProgressionMilestones = new JSONArray(lastPlayerProgressionMilestones);
+	}
+	
+	public List<String> getLastScreenVisits() {
+		return JSONUtil.arrayToStringList(_lastScreenVisits);
+	}
+	
+	public List<String> getLastItemPurchases() {
+		return JSONUtil.arrayToStringList(_lastItemPurchases);
+	}
+	
+	public List<String> getLastMessages() {
+		return JSONUtil.arrayToStringList(_lastMessages);
+	}
+	
+	public List<String> getLastPlayerProgressionCategories() {
+		return JSONUtil.arrayToStringList(_lastPlayerProgressionCategories);
+	}
+	
+	public List<String> getLastPlayerProgressionMilestones() {
+		return JSONUtil.arrayToStringList(_lastPlayerProgressionMilestones);
+	}
 
 	public JSONObject toJSONObject() throws JSONException {
 		JSONObject obj = new JSONObject();
@@ -219,6 +269,13 @@ public class PurchaseData implements Serializable {
 			obj.put("user", _user);
 		if(_msgId != -1)
 			obj.put("msgId", _msgId);
+
+		obj.putOpt("lastScreenVisits", _lastScreenVisits);
+		obj.putOpt("lastItemPurchases", _lastItemPurchases);
+		obj.putOpt("lastMessages", _lastMessages);
+		obj.putOpt("lastPlayerProgressionCategories", _lastPlayerProgressionCategories);
+		obj.putOpt("lastPlayerProgressionMilestones", _lastPlayerProgressionMilestones);
+		
 		return obj;
 	}
 
@@ -243,6 +300,13 @@ public class PurchaseData implements Serializable {
 			data._user = purchaseJSON.getString("user");
 		if(purchaseJSON.has("msgId"))
 			data._msgId = purchaseJSON.getInt("msgId");
+		
+		data._lastScreenVisits = purchaseJSON.optJSONArray("lastScreenVisits");
+		data._lastItemPurchases = purchaseJSON.optJSONArray("lastItemPurchases");
+		data._lastMessages = purchaseJSON.optJSONArray("lastMessages");
+		data._lastPlayerProgressionCategories = purchaseJSON.optJSONArray("lastPlayerProgressionCategories");
+		data._lastPlayerProgressionMilestones = purchaseJSON.optJSONArray("lastPlayerProgressionMilestones");
+		
 		return data;
 	}
 

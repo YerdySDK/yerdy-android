@@ -6,6 +6,7 @@ import org.json.JSONArray;
 
 import com.yerdy.services.core.YRDPersistence.AnalyticKey;
 import com.yerdy.services.logging.YRDLog;
+import com.yerdy.services.purchases.YRDHistoryTracker;
 
 import android.content.Context;
 
@@ -19,14 +20,16 @@ public class YRDProgressionTracker {
 	// format:  { "group1" : [ "all", "logged", "events", "for", "group1" ], "group2" : [ "events" ] }
 	private JSONObject _allLoggedEvents;
 	
-	private YRDPersistence _persistance;
+	private final YRDPersistence _persistance;
+	private final YRDHistoryTracker _historyTracker;
 	
 	private final String KEY_COUNTER = "counter";
 	private final String KEY_PLAYTIME = "playtime";
 	private final String KEY_LAUNCH = "launches";
 	
-	public YRDProgressionTracker(Context cxt) {
+	public YRDProgressionTracker(Context cxt, YRDHistoryTracker historyTracker) {
 		_persistance = new YRDPersistence(cxt, cxt.getApplicationInfo().packageName, false);
+		_historyTracker = historyTracker;
 		_tracked = _persistance.getJSON(AnalyticKey.PROGRESSION_EVENTS);
 		_allLoggedEvents = _persistance.getJSON(AnalyticKey.PROGRESSION_ALL_LOGGED_EVENTS);
 	}
@@ -91,6 +94,8 @@ public class YRDProgressionTracker {
 		} catch (JSONException e) {
 			YRDLog.w(getClass(), "Failed to store list of logged progression events");
 		}
+		
+		_historyTracker.addPlayerProgression(group, servicesEventName);
 		
 		_persistance.setJSON(AnalyticKey.PROGRESSION_EVENTS, _tracked);
 		_persistance.setJSON(AnalyticKey.PROGRESSION_ALL_LOGGED_EVENTS, _allLoggedEvents);

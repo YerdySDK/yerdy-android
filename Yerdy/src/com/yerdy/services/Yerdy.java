@@ -44,6 +44,7 @@ import com.yerdy.services.messaging.YRDReward;
 import com.yerdy.services.purchases.YRDCurrencyReport;
 import com.yerdy.services.purchases.YRDCurrencyTracker;
 import com.yerdy.services.purchases.YRDPurchase;
+import com.yerdy.services.purchases.YRDHistoryTracker;
 import com.yerdy.services.push.YRDPushManager;
 import com.yerdy.services.util.YRDPlatform;
 import com.yerdy.services.util.YerdyUtil;
@@ -166,6 +167,7 @@ public class Yerdy {
 	private YRDProgressionTracker _progressionTracker;
 	private YRDEventTracker _eventTracker;
 	private YRDAdRequestTracker _adRequestTracker;
+	private YRDHistoryTracker _historyTracker;
 	private boolean _initialized = false;
 
 	/**
@@ -303,13 +305,15 @@ public class Yerdy {
 		_appVersionCode = 0;
 		if(_currencyTracker == null)
 			_currencyTracker = new YRDCurrencyTracker(context.getApplicationContext());
+		if(_historyTracker == null)
+			_historyTracker = new YRDHistoryTracker(context.getApplicationContext());
 		if(_progressionTracker == null)
-			_progressionTracker = new YRDProgressionTracker(context.getApplicationContext());
+			_progressionTracker = new YRDProgressionTracker(context.getApplicationContext(), _historyTracker);
 		if(_eventTracker == null)
 			_eventTracker = new YRDEventTracker(context.getApplicationContext());
 		if(_adRequestTracker == null)
 			_adRequestTracker = new YRDAdRequestTracker(context.getApplicationContext());
-				
+		
 		try {
 			PackageManager packageManager = context.getPackageManager();
 			PackageInfo packageInfo = packageManager.getPackageInfo(_appPacakge, 0);
@@ -501,6 +505,7 @@ public class Yerdy {
 	 */
 	public void logScreenVisit(String name) {
 		YRDAnalytics.getInstance().logScreenVisit(scrubName(name));
+		_historyTracker.addScreenVisit(scrubName(name));
 	}
 	
 	/**
@@ -701,11 +706,12 @@ public class Yerdy {
 	 * @category Currency
 	 */
 	public void purchasedItem(String item, Map<String, Integer> currencies, boolean onSale) {
-		currencies = validateAndClampCurrencies("purchasedItem", currencies);
+		currencies = validateAndClampCurrencies("purchasedItem", currencies);		
 		int msgId = _conversionTracker.check(item);
 		YRDCurrencyReport report = _currencyTracker.generateCurrencyReport(currencies);
 		YRDAnalytics.getInstance().reportVirtualPurchase(_applicationContext, item, report, msgId, onSale);
 		_currencyTracker.spentCurrencies(currencies);
+		_historyTracker.addItemPurchase(item);
 	}
 	
 	/**
@@ -755,7 +761,7 @@ public class Yerdy {
 		currencies = validateAndClampCurrencies("purchasedInApp", currencies);
 		int msgId = _conversionTracker.check(purchase.getSku());
 		YRDCurrencyReport report = _currencyTracker.generateCurrencyReport(currencies);
-		YRDAnalytics.getInstance().reportInAppPurchase(_applicationContext, purchase, report, msgId);
+		YRDAnalytics.getInstance().reportInAppPurchase(_applicationContext, purchase, report, msgId, _historyTracker);
 		_currencyTracker.boughtCurrencies(currencies);
 	}
 	
@@ -824,6 +830,8 @@ public class Yerdy {
 		synchronized(_messages) {
 			_messages.remove(msgData);
 		}
+		
+		_historyTracker.addMessage(Integer.toString(msgData.id));
 		
 		return true;
 	}

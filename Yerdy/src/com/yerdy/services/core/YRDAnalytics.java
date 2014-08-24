@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +25,7 @@ import com.yerdy.services.launch.YRDUserType;
 import com.yerdy.services.logging.YRDLog;
 import com.yerdy.services.purchases.PurchaseData;
 import com.yerdy.services.purchases.YRDCurrencyReport;
+import com.yerdy.services.purchases.YRDHistoryTracker;
 import com.yerdy.services.purchases.YRDPurchase;
 import com.yerdy.services.purchases.YRDReportIAPClient;
 import com.yerdy.services.purchases.YRDReportIAPService;
@@ -232,7 +234,7 @@ public class YRDAnalytics {
 
 	}
 	
-	public void reportInAppPurchase(Context context, YRDPurchase purchase, YRDCurrencyReport currencyReport, int messageId) {
+	public void reportInAppPurchase(Context context, YRDPurchase purchase, YRDCurrencyReport currencyReport, int messageId, YRDHistoryTracker historyTracker) {
 		PurchaseData purchaseData = new PurchaseData(purchase, currencyReport);
 		if(!purchaseData.isValid()) {
 			YRDLog.wtf(this.getClass(), "Attempted to make a purchase report with an invalid YRDpurchase object");
@@ -245,6 +247,12 @@ public class YRDAnalytics {
 		purchaseData.setLaunches(getLaunches(false));
 		purchaseData.setTotalItemsPurchased(getTotalItemsPurchased());
 		purchaseData.setMessageId(messageId);
+		
+		purchaseData.setLastScreenVisits(historyTracker.getLastScreenVisits());
+		purchaseData.setLastItemPurchases(historyTracker.getLastItemPurchases());
+		purchaseData.setLastMessages(historyTracker.getLastMessages());
+		purchaseData.setLastPlayerProgressionCategories(historyTracker.getLastPlayerProgressionCategories());
+		purchaseData.setLastPlayerProgressionMilestones(historyTracker.getLastPlayerProgressionMilestones());
 
 		values.add(purchaseData);
 		writePurchasesToReport(values);

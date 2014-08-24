@@ -60,7 +60,8 @@ public class YRDPersistence implements Serializable {
 		CUSTOM_EVENTS,
 		IS_PRE_YERDY_USER,
 		TRACK_PRE_YERDY_USER,
-		ADS_VERSIONED;
+		ADS_VERSIONED,
+		HISTORY_ITEMS;
 
 		@Override
 		public int length() {

@@ -4,7 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.*;
 
 import org.json.JSONException;
 
@@ -84,6 +84,11 @@ public class YRDReportIAPService extends YRDService {
 		postParams.put("currency_bought", purchaseData.getCurrencyPurchased());
 		postParams.put("currency_spent", purchaseData.getCurrencySpent());
 		postParams.put("items", purchaseData.getTotalItemsPurchased());
+		addArrayParams(postParams, "last_nav", purchaseData.getLastScreenVisits());
+		addArrayParams(postParams, "last_item", purchaseData.getLastItemPurchases());
+		addArrayParams(postParams, "last_msg", purchaseData.getLastMessages());
+		addArrayParams(postParams, "last_player_keys", purchaseData.getLastPlayerProgressionCategories());
+		addArrayParams(postParams, "last_player_values", purchaseData.getLastPlayerProgressionMilestones());
 
 		HttpURLConnection conn = (HttpURLConnection) javaURI.toURL().openConnection();
 		byte[] postMessage = HTTPRequestData.convertToBytes(postParams);
@@ -156,4 +161,15 @@ public class YRDReportIAPService extends YRDService {
 		}
 	}
 
+	
+	// adds params in form '<key>[<i>]=<value>'
+	private void addArrayParams(Map<String, Object> params, String key, List<String> array) {
+		if (array == null)
+			return;
+		
+		for (int i = 0; i < array.size(); i++) {
+			YRDLog.d(getClass(), "params: " + key +":" + array.get(i));
+			params.put(key + "[" + i + "]", array.get(i));
+		}
+	}
 }
