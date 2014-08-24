@@ -229,7 +229,7 @@ public class YRDAnalytics {
 		itemPurchased();
 		keychainData.save();
 		
-		purchaseService.reportVirtualPurchase(cxt, itemIdentifier, report, firstPurchase, postIapIndex, messageId, onSale,
+		purchaseService.reportVirtualPurchase(cxt, itemIdentifier, report.getTransactionAmount(), firstPurchase, postIapIndex, messageId, onSale,
 				new MetaSaveVirtaulPurchaseClient());
 
 	}
