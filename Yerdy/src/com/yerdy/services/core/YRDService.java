@@ -5,9 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.net.URI;
+import java.net.UnknownHostException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -83,8 +87,12 @@ abstract public class YRDService extends IntentService {
 			conn = prepConnection(client, new URI(androidUri.toString()));
 			responseCode = conn.getResponseCode();
 		} catch (Exception e) {
-			// Network retry
-			if (attempt < 3) {
+			// Network retry 
+			// (ONLY if we fail to connect.  If we fail to receive the response,
+			// we shouldn't retry so that we don't double/triple up stats on the server)
+			boolean shouldRetry = (e instanceof UnknownHostException || e instanceof SocketException);
+			
+			if (shouldRetry && attempt < 3) {
 				try {
 					e.printStackTrace();
 					Thread.sleep(500);
