@@ -1108,6 +1108,15 @@ public class Yerdy {
 		_featureMasteryTracker.logFeatureUse(feature, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
 	}
 
+	
+	public void setFeatureUseLevels(int usesForNovice, int usesForAmateur, int usesForMaster) {
+		_featureMasteryTracker.setFeatureUseLevels(usesForNovice, usesForAmateur, usesForMaster);
+	}
+	
+	public void setFeatureUseLevels(String feature, int usesForNovice, int usesForAmateur, int usesForMaster) {
+		_featureMasteryTracker.setFeatureUseLevels(feature, usesForNovice, usesForAmateur, usesForMaster);
+	}
+	
 	/**
 	 * Tracks a user-defined event
 	 * 

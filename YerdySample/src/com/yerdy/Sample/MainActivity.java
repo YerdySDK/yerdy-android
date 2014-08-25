@@ -90,6 +90,8 @@ public class MainActivity extends Activity implements YerdyDelegate,
 		// 	http://dashboard.yerdy.com to register & get your publisher key
 		Yerdy.getInstance().startWithPublisherKey(this, PublisherKey.PUBLISHER_KEY);
 		Yerdy.getInstance().logScreenVisit("main");
+		
+		Yerdy.getInstance().setFeatureUseLevels("Feature3", 2, 4, 6);
 	}
 
 	/*

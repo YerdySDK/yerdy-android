@@ -1,5 +1,7 @@
 package com.yerdy.services.core;
 
+import java.util.*;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +19,7 @@ public class YRDFeatureMasteryTracker {
 	
 	private static final int THRESHOLD_COUNT = 3;
 	private int[] _defaultThresholds = { 1, 4, 8 };
+	private Map<String, int[]> _thresholds;
 	
 	private YRDPersistence _persistance;
 	private YRDHistoryTracker _historyTracker;
@@ -43,6 +46,35 @@ public class YRDFeatureMasteryTracker {
 		_featureTracking = _persistance.getJSON(AnalyticKey.FEATURE_MASTERIES);
 		_tracked = _persistance.getJSON(AnalyticKey.FEATURE_MASTERIES_COUNTERS);
 		_historyTracker = historyTracker;
+		_thresholds = new HashMap<String, int[]>();
+	}
+	
+	public void setFeatureUseLevels(int usesForNovice, int usesForAmateur, int usesForMaster) {
+		if (!(usesForNovice < usesForAmateur && usesForAmateur < usesForMaster) || usesForNovice < 0 || usesForAmateur < 0 || usesForMaster < 0) {
+			YRDLog.e(getClass(), "Invalid values for default feature uses.  (novice=" + usesForNovice +", amateur=" + usesForAmateur + ", master=" + usesForMaster + ")");
+			YRDLog.e(getClass(), "All values must be positive and in ascending order (novice < amateur < master)");
+			return;
+		}
+		
+		_defaultThresholds[0] = usesForNovice;
+		_defaultThresholds[1] = usesForAmateur;
+		_defaultThresholds[2] = usesForMaster;
+	}
+	
+	public void setFeatureUseLevels(String feature, int usesForNovice, int usesForAmateur, int usesForMaster) {
+		if (feature == null) {
+			YRDLog.e(getClass(), "setFeatureUseLevels - feature must not be null");
+			return;
+		}
+		
+		if (!(usesForNovice < usesForAmateur && usesForAmateur < usesForMaster) || usesForNovice < 0 || usesForAmateur < 0 || usesForMaster < 0) {
+			YRDLog.e(getClass(), "Invalid values for " + feature + "feature uses.  (novice=" + usesForNovice +", amateur=" + usesForAmateur + ", master=" + usesForMaster + ")");
+			YRDLog.e(getClass(), "All values must be positive and in ascending order (novice < amateur < master)");
+			return;
+		}
+		
+		int[] thresholds = new int[] { usesForNovice, usesForAmateur, usesForMaster };
+		_thresholds.put(feature, thresholds);
 	}
 	
 	public void logFeatureUse(String feature, int launches, long playtime) {
@@ -77,10 +109,12 @@ public class YRDFeatureMasteryTracker {
 		int count = featureObj.optInt(COUNT, 0);
 		int submitted = featureObj.optInt(SUBMITTED, 0);
 		
+		int[] thresholds = _thresholds.containsKey(feature) ? _thresholds.get(feature) : _defaultThresholds; 
+		
 		for (int i = 0; i < THRESHOLD_COUNT; i++) {
 			int level = i + 1;
 			
-			if (count >= _defaultThresholds[i] && level > submitted) {
+			if (count >= thresholds[i] && level > submitted) {
 				submitted = level;
 				featureObj.put(SUBMITTED, level); // gets saved back to persistence via calling method
 				
