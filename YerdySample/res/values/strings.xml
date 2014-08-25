@@ -11,10 +11,10 @@
     <string name="show_ad">Request Fake Ad</string>
     <string name="title">Yerdy Sample App</string>
     
-    <string name="title_log">logEvent - buttonPressed</string>
-    <string name="red">Red</string>
-    <string name="green">Green</string>
-    <string name="blue">Blue</string>
+    <string name="title_feature">logFeatureUse</string>
+    <string name="feature1">Feature1</string>
+    <string name="feature2">Feature2</string>
+    <string name="feature3">Feature3</string>
     
     <string name="title_progression">player progression (level)</string>
     <string name="lvl1">level-1</string>

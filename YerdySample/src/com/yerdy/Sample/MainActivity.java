@@ -93,14 +93,12 @@ public class MainActivity extends Activity implements YerdyDelegate,
 	}
 
 	/*
-	 * Reports logged event to Yerdy (RGB buttons)
+	 * Logs a feature use to Yerdy (Feature1 -> Feature3 buttons)
 	 */
-	public void onLogButtonPressed(View v) {
+	public void onFeatureButtonPressed(View v) {
 		String label = getButtonLabel(v);
 		if (label != null) {
-			Map<String, String> params = new HashMap<String, String>();
-			params.put("title", label);
-			Yerdy.getInstance().logEvent("buttonPressed", params);
+			Yerdy.getInstance().logFeatureUse(label);
 		}
 	}
 	
