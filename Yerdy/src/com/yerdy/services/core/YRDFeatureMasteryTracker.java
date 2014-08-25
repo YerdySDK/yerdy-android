@@ -108,4 +108,16 @@ public class YRDFeatureMasteryTracker {
 		YRDLog.d(getClass(), "sendFeatureEvent, _tracked: " + _tracked.toString());
 	}
 	
+	public boolean isReadyToReport() {
+		return (_tracked.length() > 0);
+	}
+	
+	public JSONObject getAndResetCounters() {
+		JSONObject response = _tracked;
+		_tracked = new JSONObject();
+		_persistance.setJSON(AnalyticKey.FEATURE_MASTERIES_COUNTERS, _tracked);
+		_persistance.save();
+		return response;
+	}
+	
 }

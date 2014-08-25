@@ -100,11 +100,11 @@ public class YRDCounterService extends YRDService {
 		executeWithRequest(cxt, uri, client);
 	}
 	
-	public void reportProgressionMilestone(Context cxt, JSONObject milestones, YRDCounterClient client) {
+	public void reportPlayerProgressionOrFeature(Context cxt, JSONObject milestones, String type, YRDCounterClient client) {
 		Iterator<?> groupKeys = milestones.keys();
 		while(groupKeys.hasNext()) {
 			String groupKey = (String) groupKeys.next();
-			Uri.Builder builder = getBuilder(cxt, groupKey, "player");
+			Uri.Builder builder = getBuilder(cxt, groupKey, type);
 			JSONObject groupjson = milestones.optJSONObject(groupKey);
 			
 			if(groupjson != null) {

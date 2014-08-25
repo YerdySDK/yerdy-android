@@ -1080,7 +1080,10 @@ public class Yerdy {
 			_lastProgressionReport = SystemClock.elapsedRealtime();
 			if(!YerdyUtil.networkUnreachable(cxt)) {
 				if(_progressionTracker != null && _progressionTracker.isReadyToReport())
-					YRDAnalytics.getInstance().reportProgressionMilestone(cxt, _progressionTracker.getAndResetProgressionEvents());
+					YRDAnalytics.getInstance().reportPlayerProgressionOrFeature(cxt, _progressionTracker.getAndResetProgressionEvents(), YRDAnalytics.PLAYER_PROGRESSION_TYPE);
+				
+				if(_featureMasteryTracker != null && _featureMasteryTracker.isReadyToReport())
+					YRDAnalytics.getInstance().reportPlayerProgressionOrFeature(cxt, _featureMasteryTracker.getAndResetCounters(), YRDAnalytics.FEATURE_MASTERY_TYPE);
 				
 				if(_eventTracker != null && _eventTracker.isReadyToReport())
 					YRDAnalytics.getInstance().reportCustomEvent(_applicationContext, _eventTracker.getAndResetCustomEvents());
