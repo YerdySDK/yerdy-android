@@ -12,11 +12,13 @@ import android.content.Context;
 
 public class YRDHistoryTracker {
 	
-	private static final String SCREEN_VISITS = "ScreenVisits";
-	private static final String ITEM_PURCHASES = "ItemPurchases";
-	private static final String LAST_MESSAGES = "LastMessages";
-	private static final String LAST_PROGRESSION_CATEGORIES = "LastProgressionCategories";
-	private static final String LAST_PROGRESSION_MILESTONES = "LastProgressionMilestones";
+	private static final String LAST_FEATURE_USES = "FeatureUses";
+	private static final String LAST_ITEM_PURCHASES = "ItemPurchases";
+	private static final String LAST_MESSAGES = "Messages";
+	private static final String LAST_PROGRESSION_CATEGORIES = "ProgressionCategories";
+	private static final String LAST_PROGRESSION_MILESTONES = "ProgressionMilestones";
+	private static final String LAST_FEATURE_NAMES = "FeatureNames";
+	private static final String LAST_FEATURE_LEVELS = "FeatureLevels";
 	
 	private static int MAX_ITEMS_TO_TRACK = 3;
 	
@@ -27,16 +29,16 @@ public class YRDHistoryTracker {
 		_persistence = new YRDPersistence(ctx, ctx.getApplicationInfo().packageName, false);
 	}
 	
-	public void addScreenVisit(String screen) {
-		if (screen == null) {
-			YRDLog.e(getClass(), "addScreenVisits - screen was null");
+	public void addFeatureUse(String feature) {
+		if (feature == null) {
+			YRDLog.e(getClass(), "addFeatureUse - feature was null");
 			return;
 		}
-		addHistoryItem(SCREEN_VISITS, screen);
+		addHistoryItem(LAST_FEATURE_USES, feature);
 	}
 	
-	public List<String> getLastScreenVisits() {
-		return getHistoryItems(SCREEN_VISITS);
+	public List<String> getLastFeatureUses() {
+		return getHistoryItems(LAST_FEATURE_USES);
 	}
 	
 	public void addItemPurchase(String item) {
@@ -44,11 +46,11 @@ public class YRDHistoryTracker {
 			YRDLog.e(getClass(), "addItemPurchase - item was null");
 			return;
 		}
-		addHistoryItem(ITEM_PURCHASES, item);
+		addHistoryItem(LAST_ITEM_PURCHASES, item);
 	}
 	
 	public List<String> getLastItemPurchases() {
-		return getHistoryItems(ITEM_PURCHASES);
+		return getHistoryItems(LAST_ITEM_PURCHASES);
 	}
 	
 	public void addMessage(String msgId) {
@@ -78,6 +80,19 @@ public class YRDHistoryTracker {
 	
 	public List<String> getLastPlayerProgressionMilestones() {
 		return getHistoryItems(LAST_PROGRESSION_MILESTONES);
+	}
+	
+	public void addFeatureLevel(String feature, int level) {
+		addHistoryItem(LAST_FEATURE_NAMES, feature);
+		addHistoryItem(LAST_FEATURE_LEVELS, "_" + Integer.toString(level));
+	}
+	
+	public List<String> getLastFeatureNames() {
+		return getHistoryItems(LAST_FEATURE_NAMES);
+	}
+	
+	public List<String>getLastFeatureLevels() {
+		return getHistoryItems(LAST_FEATURE_LEVELS);
 	}
 	
 	private void addHistoryItem(String type, String item) {

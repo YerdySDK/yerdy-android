@@ -324,12 +324,14 @@ public class YRDAnalytics {
 		purchaseData.setTotalItemsPurchased(getTotalItemsPurchased());
 		purchaseData.setMessageId(messageId);
 		
-		purchaseData.setLastScreenVisits(historyTracker.getLastScreenVisits());
+		purchaseData.setLastFeatureUses(historyTracker.getLastFeatureUses());
 		purchaseData.setLastItemPurchases(historyTracker.getLastItemPurchases());
 		purchaseData.setLastMessages(historyTracker.getLastMessages());
 		purchaseData.setLastPlayerProgressionCategories(historyTracker.getLastPlayerProgressionCategories());
 		purchaseData.setLastPlayerProgressionMilestones(historyTracker.getLastPlayerProgressionMilestones());
-
+		purchaseData.setLastFeatureNames(historyTracker.getLastFeatureNames());
+		purchaseData.setLastFeatureLevels(historyTracker.getLastFeatureLevels());
+		
 		values.add(purchaseData);
 		writePurchasesToReport(values);
 		

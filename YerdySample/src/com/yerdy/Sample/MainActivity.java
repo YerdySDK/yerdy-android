@@ -89,7 +89,7 @@ public class MainActivity extends Activity implements YerdyDelegate,
 		// 	to PublisherKey.java & update it with your publisher key.  You can visit
 		// 	http://dashboard.yerdy.com to register & get your publisher key
 		Yerdy.getInstance().startWithPublisherKey(this, PublisherKey.PUBLISHER_KEY);
-		Yerdy.getInstance().logScreenVisit("main");
+		Yerdy.getInstance().logFeatureUse("main_screen");
 		
 		Yerdy.getInstance().setFeatureUseLevels("Feature3", 2, 4, 6);
 	}
@@ -167,7 +167,7 @@ public class MainActivity extends Activity implements YerdyDelegate,
 		dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
-				Yerdy.getInstance().logScreenVisit("main");
+				Yerdy.getInstance().logFeatureUse("main_screen");
 			}
 		});
 
@@ -204,7 +204,7 @@ public class MainActivity extends Activity implements YerdyDelegate,
 
 		dialog.show();
 		updateShownBalance();
-		Yerdy.getInstance().logScreenVisit("bank");
+		Yerdy.getInstance().logFeatureUse("bank");
 	}
 
 	/*

@@ -79,6 +79,8 @@ public class YRDFeatureMasteryTracker {
 	
 	public void logFeatureUse(String feature, int launches, long playtime) {
 		try {
+			_historyTracker.addFeatureUse(feature);
+			
 			JSONObject featureObj = _featureTracking.optJSONObject(feature);
 			if (featureObj == null) {
 				featureObj = new JSONObject();
@@ -124,6 +126,8 @@ public class YRDFeatureMasteryTracker {
 	}
 	
 	private void sendFeatureEvent(String feature, int level, int launches, long playtime) throws JSONException {
+		_historyTracker.addFeatureLevel(feature, level);
+		
 		JSONObject eventObj = new JSONObject();
 		eventObj.put("counter", 1);
 		eventObj.put("launches", launches);
