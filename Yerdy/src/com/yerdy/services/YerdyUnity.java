@@ -105,7 +105,7 @@ public class YerdyUnity {
 	
 	public boolean isMessageAvailiable(String placement) {
 		YRDLog.i(YerdyUnity.class, "isMessageAvailiable:"+placement);
-		return Yerdy.getInstance().isMessageAvailiable(placement);
+		return Yerdy.getInstance().isMessageAvailable(placement);
 	}
 	
 	public void purchasedItem(String item, Map<String, Integer> currencies, boolean onSale) {

@@ -144,7 +144,7 @@ public class MainActivity extends Activity implements YerdyDelegate,
 	 * Checks for and displays pull messages if they exist
 	 */
 	public void onGetMessageClick(View v) {
-		boolean hasMessage = Yerdy.getInstance().isMessageAvailiable("test");
+		boolean hasMessage = Yerdy.getInstance().isMessageAvailable("test");
 		if (!hasMessage) {
 			showAlert("No Messages",
 					"No messages are currently availiable for the selected placement");

@@ -64,9 +64,9 @@ import com.yerdy.services.util.YerdyUtil;
  * <h3>Showing messages</h3>
  * <p>To show a message, simply call {@link #showMessage(Activity, String)}, passing in a context and placement:</p>
  * <pre>{@code Yerdy.getInstance().showMessage(this, "launch");}</pre>
- * <p>If you wish to check if a message is available before trying to show one, you can use {@link #isMessageAvailiable(String)}</p>
+ * <p>If you wish to check if a message is available before trying to show one, you can use {@link #isMessageAvailable(String)}</p>
  * <pre>{@code 
-	if(Yerdy.getInstance().isMessageAvailiable("launch"))
+	if(Yerdy.getInstance().isMessageAvailable("launch"))
  		Yerdy.getInstance().showMessage(this, "launch");}</pre>
  *   
  * <h3>Handling message triggered rewards and purchases</h3>
@@ -629,7 +629,7 @@ public class Yerdy {
 	 * @return Whether or not a message is available
 	 * @category Messaging
 	 */
-	public boolean isMessageAvailiable(String placement) {
+	public boolean isMessageAvailable(String placement) {
 		return this.getMessageForPlacement(placement) != null;
 	}
 	
@@ -1024,7 +1024,7 @@ public class Yerdy {
 		}
 		
 		private boolean shouldShowAnotherMessage() {
-			boolean canShow = (!_didDismissMessage && isMessageAvailiable(_currentPlacement));
+			boolean canShow = (!_didDismissMessage && isMessageAvailable(_currentPlacement));
 			if (canShow && _yerdyMessageDelegate != null && 
 					_yerdyMessageDelegate.shouldShowAnotherMessageAfterUserCancelForPlacement(_currentPlacement))
 				return true;
