@@ -21,6 +21,7 @@ import android.os.SystemClock;
 import com.yerdy.services.ads.YRDAdRequestTracker;
 import com.yerdy.services.core.YRDAnalytics;
 import com.yerdy.services.core.YRDEventTracker;
+import com.yerdy.services.core.YRDFeatureMasteryTracker;
 import com.yerdy.services.core.YRDProgressionTracker;
 import com.yerdy.services.core.YRDTaskScheduler;
 import com.yerdy.services.core.YRDTimerTask;
@@ -168,6 +169,7 @@ public class Yerdy {
 	private YRDEventTracker _eventTracker;
 	private YRDAdRequestTracker _adRequestTracker;
 	private YRDHistoryTracker _historyTracker;
+	private YRDFeatureMasteryTracker _featureMasteryTracker;
 	private boolean _initialized = false;
 
 	/**
@@ -313,6 +315,8 @@ public class Yerdy {
 			_eventTracker = new YRDEventTracker(context.getApplicationContext());
 		if(_adRequestTracker == null)
 			_adRequestTracker = new YRDAdRequestTracker(context.getApplicationContext());
+		if (_featureMasteryTracker == null)
+			_featureMasteryTracker = new YRDFeatureMasteryTracker(context, _historyTracker);
 		
 		try {
 			PackageManager packageManager = context.getPackageManager();
@@ -1076,17 +1080,43 @@ public class Yerdy {
 			_lastProgressionReport = SystemClock.elapsedRealtime();
 			if(!YerdyUtil.networkUnreachable(cxt)) {
 				if(_progressionTracker != null && _progressionTracker.isReadyToReport())
-					YRDAnalytics.getInstance().reportProgressionMilestone(cxt, _progressionTracker.getAndResetProgressionEvents());
+					YRDAnalytics.getInstance().reportPlayerProgressionOrFeature(cxt, _progressionTracker.getAndResetProgressionEvents(), YRDAnalytics.PLAYER_PROGRESSION_TYPE);
+				
+				if(_featureMasteryTracker != null && _featureMasteryTracker.isReadyToReport())
+					YRDAnalytics.getInstance().reportPlayerProgressionOrFeature(cxt, _featureMasteryTracker.getAndResetCounters(), YRDAnalytics.FEATURE_MASTERY_TYPE);
 				
 				if(_eventTracker != null && _eventTracker.isReadyToReport())
 					YRDAnalytics.getInstance().reportCustomEvent(_applicationContext, _eventTracker.getAndResetCustomEvents());
+				
 
 				//YRDAnalytics.getInstance().reportCustomEvent(_applicationContext, name, parameterName, bucketName, 1);
 			}
 		}
 	}
 	
+	/**
+	 * Logs the user's use of a feature in your game
+	 * 
+	 * <p>You can use this to track which features your users actually use, allowing you to make
+ 	 * decisions regarding which features to improve or bring more attention to in your game</p>
+	 * 
+	 * <pre>{@code Yerdy.getInstance().logFeatureUse("ItemUpgrade");}
+	 * @param feature
+	 * @category Event Tracking
+	 */
+	public void logFeatureUse(String feature) {
+		_featureMasteryTracker.logFeatureUse(feature, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
+	}
 
+	
+	public void setFeatureUseLevels(int usesForNovice, int usesForAmateur, int usesForMaster) {
+		_featureMasteryTracker.setFeatureUseLevels(usesForNovice, usesForAmateur, usesForMaster);
+	}
+	
+	public void setFeatureUseLevels(String feature, int usesForNovice, int usesForAmateur, int usesForMaster) {
+		_featureMasteryTracker.setFeatureUseLevels(feature, usesForNovice, usesForAmateur, usesForMaster);
+	}
+	
 	/**
 	 * Tracks a user-defined event
 	 * 

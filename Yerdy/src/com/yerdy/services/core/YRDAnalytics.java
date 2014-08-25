@@ -37,6 +37,9 @@ import com.yerdy.services.util.YerdyUtil;
 
 public class YRDAnalytics {
 
+	public static final String PLAYER_PROGRESSION_TYPE = "player";
+	public static final String FEATURE_MASTERY_TYPE = "feature";
+	
 	YRDPersistence keychainData;
 
 	YRDLaunchClient launchClient;
@@ -809,9 +812,9 @@ public class YRDAnalytics {
 		counterService.reportTimedMilestone(cxt, marker, currency, virtualPurchases, launches, new MetaMilestoneClient());
 	}
 	
-	public void reportProgressionMilestone(Context cxt, JSONObject milestones) {
-		YRDCounterService counterService = new YRDCounterService();		
-		counterService.reportProgressionMilestone(cxt, milestones, new MetaMilestoneClient());
+	public void reportPlayerProgressionOrFeature(Context cxt, JSONObject milestones, String type) {
+		YRDCounterService counterService = new YRDCounterService();
+		counterService.reportPlayerProgressionOrFeature(cxt, milestones, type, new MetaMilestoneClient());
 	}
 
 	protected class MetaMilestoneClient extends YRDCounterClient {
