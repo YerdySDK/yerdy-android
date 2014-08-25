@@ -93,11 +93,6 @@ public class YerdyUnity {
 		Yerdy.getInstance().setShouldTrackPreYerdyUserProgression(flag);
 	}
 	
-	public void logScreenVisit(String name) {
-		YRDLog.i(YerdyUnity.class, "logScreenVisit:"+name);
-		Yerdy.getInstance().logScreenVisit(name);
-	}
-	
 	public void configureGoogleLVLKey(String lvlKey) {
 		YRDLog.i(YerdyUnity.class, "configureGoogleLVLKey");
 		Yerdy.getInstance().configureGoogleLVLKey(getRootActivity(), lvlKey, lvlHandler);

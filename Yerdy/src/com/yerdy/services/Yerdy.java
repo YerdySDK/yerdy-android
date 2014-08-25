@@ -502,17 +502,6 @@ public class Yerdy {
 	}
 	
 	/**
-	 * Tracks a screen visit
-	 * 
-	 * @param name The name of the screen (for example: �settings�, �store�, etc�)
-	 * @category Event Tracking
-	 */
-	public void logScreenVisit(String name) {
-		YRDAnalytics.getInstance().logScreenVisit(scrubName(name));
-		_historyTracker.addScreenVisit(scrubName(name));
-	}
-	
-	/**
 	 * @return currently detected or manually specified platform
 	 * @see com.yerdy.services.util.YRDPlatform YRDPlatform
 	 * @category Configuration
@@ -1105,16 +1094,36 @@ public class Yerdy {
 	 * @category Event Tracking
 	 */
 	public void logFeatureUse(String feature) {
-		_featureMasteryTracker.logFeatureUse(feature, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
+		String scrubbed = scrubName(feature);
+		YRDAnalytics.getInstance().logScreenVisit(scrubbed);
+		_featureMasteryTracker.logFeatureUse(scrubbed, YRDAnalytics.getInstance().getLaunches(false), YRDAnalytics.getInstance().getPlaytimeMS(false));
 	}
 
-	
+	/** 
+	 * Sets the default number of feature uses required for a user to reach the novice, amateur and master levels
+	 * 
+	 * NOTE: Setting these is optional.  If not set, Yerdy uses it's own defaults
+	 * 
+	 * @param usesForNovice
+	 * @param usesForAmateur
+	 * @param usesForMaster
+	 */
 	public void setFeatureUseLevels(int usesForNovice, int usesForAmateur, int usesForMaster) {
 		_featureMasteryTracker.setFeatureUseLevels(usesForNovice, usesForAmateur, usesForMaster);
 	}
 	
+	/**
+	 * Sets the number of feature uses required for a user to reach the novice, amateur and master levels for a specific feature
+	 * 
+	 * NOTE: Setting these is optional.  If not set, Yerdy uses it's own defaults
+	 * 
+	 * @param feature
+	 * @param usesForNovice
+	 * @param usesForAmateur
+	 * @param usesForMaster
+	 */
 	public void setFeatureUseLevels(String feature, int usesForNovice, int usesForAmateur, int usesForMaster) {
-		_featureMasteryTracker.setFeatureUseLevels(feature, usesForNovice, usesForAmateur, usesForMaster);
+		_featureMasteryTracker.setFeatureUseLevels(scrubName(feature), usesForNovice, usesForAmateur, usesForMaster);
 	}
 	
 	/**
