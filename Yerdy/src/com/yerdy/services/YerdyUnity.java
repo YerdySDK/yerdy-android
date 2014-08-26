@@ -98,8 +98,8 @@ public class YerdyUnity {
 		Yerdy.getInstance().configureGoogleLVLKey(getRootActivity(), lvlKey, lvlHandler);
 	}
 	
-	public boolean isMessageAvailiable(String placement) {
-		YRDLog.i(YerdyUnity.class, "isMessageAvailiable:"+placement);
+	public boolean isMessageAvailable(String placement) {
+		YRDLog.i(YerdyUnity.class, "isMessageAvailable:"+placement);
 		return Yerdy.getInstance().isMessageAvailable(placement);
 	}
 	
@@ -151,6 +151,21 @@ public class YerdyUnity {
 	public void logPlayerProgression(String category, String milestone) {
 		YRDLog.i(YerdyUnity.class, "logPlayerProgression:"+category+","+milestone);
 		Yerdy.getInstance().logPlayerProgression(category, milestone);
+	}
+	
+	public void logFeatureUse(String feature) {
+		YRDLog.i(YerdyUnity.class, "logFeatureUse:" + feature);
+		Yerdy.getInstance().logFeatureUse(feature);
+	}
+	
+	public void setFeatureUseLevels(int usesForNovice, int usesForAmateur, int usesForMaster) {
+		YRDLog.i(YerdyUnity.class, "setFeatureUseLevels:" + usesForNovice + "," + usesForAmateur + "," + usesForMaster);
+		Yerdy.getInstance().setFeatureUseLevels(usesForNovice, usesForAmateur, usesForMaster);
+	}
+	
+	public void setFeatureUseLevels(String feature, int usesForNovice, int usesForAmateur, int usesForMaster) {
+		YRDLog.i(YerdyUnity.class, "setFeatureUseLevels:" + feature + "," + usesForNovice + "," + usesForAmateur + "," + usesForMaster);
+		Yerdy.getInstance().setFeatureUseLevels(feature, usesForNovice, usesForAmateur, usesForMaster);
 	}
 	
 	public void logEvent(String name, Map<String, String>map) {
