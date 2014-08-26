@@ -272,7 +272,7 @@ public class Yerdy {
 		if(!newSession)
 			_timeTracker.resume();
 		else {
-			_adRequestTracker.reset();
+			_adRequestTracker.didReportToServer();
 			_timeTracker.dequeueAll();
 			queueTimeMilestone();
 		}
@@ -349,11 +349,11 @@ public class Yerdy {
 
 		boolean newVersion = YRDAnalytics.getInstance().versionMismatch();
 		if(newVersion)
-			_adRequestTracker.reset();
+			_adRequestTracker.newVersionDetected();
 		
 		YRDAnalytics.getInstance().appHandleActivate(context, _currencyTracker.generateCurrencyReport(null), _adRequestTracker.generateReport(), false);
 		queueTimeMilestone();
-		_adRequestTracker.reset();
+		_adRequestTracker.didReportToServer();
 		
 		YRDLog.i(this.getClass(), "Starting.  Version: " + YerdyVersion.VERSION);
 		YRDLog.i(this.getClass(), "To enable test mode for this device, copy/paste the device ID below into the Yerdy dashboard.");

@@ -1,8 +1,6 @@
 package com.yerdy.services.ads;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,13 +19,38 @@ public class YRDAdRequestTracker {
 	private final String KEY_FILL = "fill";
 	
 	private YRDPersistence _persistance;
+	
+	private boolean _hasReportedToServer;
+	private List<String> _preServerReportRequests;
+	private List<String> _preServerReportFills; 
 
 	public YRDAdRequestTracker(Context cxt) {
 		_persistance = new YRDPersistence(cxt, cxt.getApplicationInfo().packageName, false);
 		_ads = _persistance.getJSON(AnalyticKey.ADS_VERSIONED);
+		
+		_hasReportedToServer = false;
+		_preServerReportRequests = new ArrayList<String>();
+		_preServerReportFills = new ArrayList<String>();
 	}
 	
-	public void reset() {
+	public void newVersionDetected() {
+		reset();
+	}
+	
+	public void didReportToServer() {
+		reset();
+		if (!_hasReportedToServer) {
+			_hasReportedToServer = true;
+			for (String s : _preServerReportRequests)
+				logAdRequest(s);
+			for (String s : _preServerReportFills)
+				logAdFill(s);
+			_preServerReportRequests.clear();
+			_preServerReportFills.clear();
+		}
+	}
+	
+	private void reset() {
 		_ads = new JSONObject();
 		_persistance.deleteKey(AnalyticKey.ADS_VERSIONED);
 		_persistance.save();
@@ -49,11 +72,19 @@ public class YRDAdRequestTracker {
 	}
 	
 	public void logAdFill(String network) {
-		updateNetwork(network, KEY_FILL);
+		if (_hasReportedToServer) {
+			updateNetwork(network, KEY_FILL);
+		} else {
+			_preServerReportFills.add(network);
+		}
 	}
 	
 	public void logAdRequest(String network) {
-		updateNetwork(network, KEY_REQUEST);
+		if (_hasReportedToServer) {
+			updateNetwork(network, KEY_REQUEST);
+		} else {
+			_preServerReportRequests.add(network);
+		}
 	}
 	
 	private void updateNetwork(String network, String key) {
