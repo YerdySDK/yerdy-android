@@ -178,7 +178,7 @@ public class YRDAnalytics {
 		startTimer();
 	}
 
-	public void reportLaunch(Context cxt, YRDCurrencyReport currencyReport, Map<String, String> adReport, boolean isRefresh) {
+	public void reportLaunch(Context cxt, YRDCurrencyReport currencyReport, Map<String, String> adReport, YRDHistoryTracker historyTracker, boolean isRefresh) {
 		YRDLaunchService launchService = new YRDLaunchService();
 
 		final Map<String, Object> info = new HashMap<String, Object>();
@@ -186,10 +186,29 @@ public class YRDAnalytics {
 		
 		// if counted launch = true then exit has not yet been called and is
 		// waiting for an exit call thus hey are not balanced
+		int crashes;
 		if (countedLaunch) {
-			info.put("crashes", getEnters() - (getExits() + 1));
+			crashes = getEnters() - getExits() + 1;
 		} else {
-			info.put("crashes", getEnters() - (getExits()));
+			crashes = getEnters() - getExits();
+		}
+		info.put("crashes", crashes);
+
+		// report last feature before crash (if this was a crash)
+		if (!isRefresh) {
+			int lastReported = keychainData.getValue(AnalyticKey.LAST_REPORTED_CRASH_COUNT, 0);
+
+			if (crashes > lastReported) { // only check greater than, since crashes gets set back to 0 on new version
+				if (historyTracker != null) {
+					List<String> lastFeatures = historyTracker.getLastFeatureUses();
+					if (lastFeatures != null && lastFeatures.size() > 0) {
+						info.put("feature_before_crash", lastFeatures.get(0));
+					}
+				}
+			}
+			
+			lastReported = crashes;
+			keychainData.setValue(AnalyticKey.LAST_REPORTED_CRASH_COUNT, lastReported);
 		}
 		
 		if(isRefresh) {
@@ -201,7 +220,7 @@ public class YRDAnalytics {
 		
 		JSONObject loggedScreenVisits = keychainData.getJSON(AnalyticKey.SCREEN_VISITS);
 		keychainData.deleteKey(AnalyticKey.SCREEN_VISITS);
-		keychainData.save();
+		keychainData.save();  // also saves LAST_REPORTED_CRASH_COUNT above
 		_screenVisits = new JSONObject();
 		
 		MetaLaunchClient client = new MetaLaunchClient(cxt);
@@ -363,7 +382,7 @@ public class YRDAnalytics {
 	 * @param soft
 	 * @return returns true if being reported as a launch
 	 */
-	public boolean appHandleActivate(Context cxt, YRDCurrencyReport currencyReport, Map<String, String> adReport, boolean soft) {
+	public boolean appHandleActivate(Context cxt, YRDCurrencyReport currencyReport, Map<String, String> adReport, YRDHistoryTracker historyTracker, boolean soft) {
 		_activated = true;
 		long now = System.currentTimeMillis();
 		long lastBackground = keychainData.getValue(AnalyticKey.BACKGROUND_TIMER, now);
@@ -385,7 +404,7 @@ public class YRDAnalytics {
 
 		countLaunch();
 
-		reportLaunch(cxt, currencyReport, adReport, false);
+		reportLaunch(cxt, currencyReport, adReport, historyTracker, false);
 		uploadIfNeeded(cxt);
 
 		currentTry = minTry;

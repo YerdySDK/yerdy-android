@@ -66,7 +66,8 @@ public class YRDPersistence implements Serializable {
 		PENDING_VIRTUAL_PURCHASES, // virtual purchases on hold due to validating first IAP
 		PURCHASE_VALIDATION_STATE, // see YRDAnalytics.ValidationState
 		FEATURE_MASTERIES,
-		FEATURE_MASTERIES_COUNTERS;
+		FEATURE_MASTERIES_COUNTERS,
+		LAST_REPORTED_CRASH_COUNT;
 		
 		@Override
 		public int length() {

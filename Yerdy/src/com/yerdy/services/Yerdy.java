@@ -267,7 +267,7 @@ public class Yerdy {
 	 */
 	protected void activate(Activity activity, boolean soft) {
 		sendEvents(activity);
-		boolean newSession = YRDAnalytics.getInstance().appHandleActivate(activity, _currencyTracker.generateCurrencyReport(null), _adRequestTracker.generateReport(), true);
+		boolean newSession = YRDAnalytics.getInstance().appHandleActivate(activity, _currencyTracker.generateCurrencyReport(null), _adRequestTracker.generateReport(), _historyTracker, true);
 
 		if(!newSession)
 			_timeTracker.resume();
@@ -351,7 +351,7 @@ public class Yerdy {
 		if(newVersion)
 			_adRequestTracker.newVersionDetected();
 		
-		YRDAnalytics.getInstance().appHandleActivate(context, _currencyTracker.generateCurrencyReport(null), _adRequestTracker.generateReport(), false);
+		YRDAnalytics.getInstance().appHandleActivate(context, _currencyTracker.generateCurrencyReport(null), _adRequestTracker.generateReport(), _historyTracker, false);
 		queueTimeMilestone();
 		_adRequestTracker.didReportToServer();
 		
@@ -483,7 +483,7 @@ public class Yerdy {
 					int amount = currencies.get(key);
 					if(amount != 0) {
 						YRDCurrencyReport currencyReport = _currencyTracker.generateCurrencyReport(null);
-						YRDAnalytics.getInstance().reportLaunch(_applicationContext, currencyReport, _adRequestTracker.generateReport(), true);
+						YRDAnalytics.getInstance().reportLaunch(_applicationContext, currencyReport, _adRequestTracker.generateReport(), _historyTracker, true);
 						return;
 					}
 				}
