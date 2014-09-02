@@ -188,7 +188,7 @@ public class YRDAnalytics {
 		// waiting for an exit call thus hey are not balanced
 		int crashes;
 		if (countedLaunch) {
-			crashes = getEnters() - getExits() + 1;
+			crashes = getEnters() - getExits() - 1;
 		} else {
 			crashes = getEnters() - getExits();
 		}
