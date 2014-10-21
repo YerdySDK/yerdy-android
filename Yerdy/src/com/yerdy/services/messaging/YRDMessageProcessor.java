@@ -78,7 +78,19 @@ public class YRDMessageProcessor extends YRDJsonProcessor {
 							msg.imageBitmap = fetchBitmap(msg.imageURI);
 							msg.watermarkBitmap = fetchBitmap(msg.watermarkImageURI);
 
-							if(YRDAppActionParser.parseAction(msg.action) != null)
+							// to fix potential backwards compatibility issues with newer SDKs adding new app action types,
+							// we check to make sure we can parse & handle the given app action before sending it off to 
+							// the rest of Yerdy
+							boolean validAction;
+							if (msg.actionType == YRDMessageActionType.APP) {
+								// check to verify we support the app action in this version of the SDK
+								validAction = YRDAppActionParser.parseAction(msg.action) != null;
+							} else {
+								// external / internal browser - always valid
+								validAction = true;
+							}
+							
+							if (validAction)
 								_messages.add(msg);
 						} catch (Exception e) {
 							YRDLog.e(this.getClass(), "Failed to parse message, it will be ignored");
