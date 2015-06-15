@@ -4,18 +4,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
 
-import com.yerdy.services.Yerdy;
 import com.yerdy.services.logging.YRDLog;
+import com.yerdy.services.push.gcm.GCMIntentService;
 
 /**
  * Manages local system notifications
@@ -40,10 +34,9 @@ public class YRDNotificationsManager {
 	}
 
 	public void purgeNotifications() {
-
-		timer.purge();
-
-	}
+        timer.cancel();
+        timer = new Timer("YerdyNotifications", true);
+    }
 
 	public int newNotification(YRDNotificationData notification) {
 		notification.notificationId = ++currNotificationId;
@@ -103,42 +96,8 @@ public class YRDNotificationsManager {
 
 	@SuppressWarnings("deprecation")
 	private void showNotifcation(YRDNotificationData noteData) {
-
-		Context context = noteData.context;
-
-		// Prep Notification object. Use Resources instead of R,
-		// as Unity will regenerate the R values, not an issue for native games
-		Resources res = context.getResources();
-		int icon = res.getIdentifier("notification_icon", "drawable", Yerdy
-				.getInstance().getAppPackage());
-
-		// Unity makes this a loose binding now, make sure someone knows. Normal
-		// Java shouldn't experience this
-		if (0 == icon) {
-			YRDLog.w(
-					getClass(),
-					"Missing resource 'drawable.notification_icon' check you have one in Assets/Plugins/Android/res");
-		}
-
-		Notification nativeNotification = new Notification(icon,
-				noteData.tickerText, noteData.atTime);
-
-		// Prep PendingIntent assigned to notification (start game)
-		Intent notificationIntent = new Intent("android.intent.action.MAIN");
-		// notificationIntent.setComponent(null);
-		notificationIntent.addCategory("android.intent.category.LAUNCHER");
-
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-				notificationIntent, 0);
-
-		nativeNotification.setLatestEventInfo(context, noteData.title,
-				noteData.text, contentIntent);
-
-		NotificationManager mNotificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager
-				.notify(noteData.notificationId, nativeNotification);
-	}
+        GCMIntentService.notify(noteData.context, GCMIntentService.MessageID.LOCAL, noteData.title.toString(), noteData.text.toString());
+    }
 
 	class NotifcationTask extends TimerTask {
 		YRDNotificationData notification;

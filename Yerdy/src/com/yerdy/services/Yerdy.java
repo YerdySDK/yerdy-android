@@ -889,6 +889,16 @@ public class Yerdy {
 		return YRDUserInfo.getInstance(cxt).getUserType() == YRDUserType.PAY;
 	}
 	
+	/**
+	 * Is the user a premium user? (Do they have any validated IAP purchases?)
+	 * @param cxt activity context
+	 * @return is premium user
+	 * @category Utilities
+	 */
+	public boolean getIsCheatingUser(Context cxt) {
+		return YRDUserInfo.getInstance(cxt).getUserType() == YRDUserType.CHEAT;
+	}
+	
 	private class PresenterDelegate implements YRDMessagePresenterDelegate {
 		@Override
 		public void willPresentMessage(Activity activity, YRDMessagePreseneter presenter, YRDMessage message) {

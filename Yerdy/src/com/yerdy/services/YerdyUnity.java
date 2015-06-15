@@ -1,8 +1,12 @@
 package com.yerdy.services;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.text.TextUtils;
@@ -18,7 +22,9 @@ import com.yerdy.services.messaging.YRDInAppPurchase;
 import com.yerdy.services.messaging.YRDItemPurchase;
 import com.yerdy.services.messaging.YRDReward;
 import com.yerdy.services.messaging.YRDRewardItem;
+import com.yerdy.services.notifications.YRDNotificationData;
 import com.yerdy.services.purchases.YRDPurchase;
+import com.yerdy.services.push.YRDLocalReceiver;
 import com.yerdy.services.util.YRDPlatform;
 
 public class YerdyUnity {
@@ -141,6 +147,11 @@ public class YerdyUnity {
 	public boolean getIsPremiumUser() {
 		YRDLog.i(YerdyUnity.class, "getIsPremiumUser");
 		return Yerdy.getInstance().getIsPremiumUser(getRootActivity());
+	}
+	
+	public boolean getIsCheatingUser() {
+		YRDLog.i(YerdyUnity.class, "getIsCheatingUser");
+		return Yerdy.getInstance().getIsCheatingUser(getRootActivity());
 	}
 	
 	public void startPlayerProgression(String category, String milestone) {
@@ -270,4 +281,60 @@ public class YerdyUnity {
 		YRDLog.i(YerdyUnity.class, "logAdFill:"+network);
 		Yerdy.getInstance().logAdFill(network);
 	}
+	
+	private YRDLocalReceiver alarm = null;
+    public void commitLocalNotifications(String json)
+    {
+        YRDLog.i(getClass(), "Setting notifications with json: "
+                + json);
+        try {
+            JSONArray notificationsArray = new JSONArray(json);
+
+            for (int i = 0; i < notificationsArray.length(); i++) {
+                JSONObject jsonObj = notificationsArray.optJSONObject(i);
+                if (jsonObj == null)
+                    continue;
+
+                // int notificationId, CharSequence title, CharSequence text,
+                // CharSequence tickerText,
+                // long notifyTime, Context applicationContext
+                // retVal.transactionAmount =
+                // json.optString("transactionAmount");
+                // retVal.firstPurchase = json.optBoolean("firstPurchase");
+                // retVal.postIapIndex = json.optInt("postIapIndex");
+
+                YRDNotificationData notification = new YRDNotificationData(
+                        jsonObj.optInt("notificationId"),
+                        jsonObj.optString("title"),
+                        jsonObj.optString("alertBody"),
+                        jsonObj.optString("tickerText"),
+                        jsonObj.optLong("notifyTime"), getRootActivity());
+
+                YRDLog.i(getClass(), "Adding notifications with title: "
+                        + notification.title + ", body: " + notification.text);
+                
+                if(alarm == null)
+                    alarm = new YRDLocalReceiver();
+                Calendar noticeTime = Calendar.getInstance();
+                noticeTime.setTimeInMillis(notification.atTime);
+
+                alarm.SetAlarm(getRootActivity(), notification.title.toString(), notification.text.toString(), noticeTime, -1, notification.notificationId);
+            }
+        } catch (Exception e) {
+            // Do nothing on error
+            YRDLog.w(getClass(),
+                    "Error trying to add notifications using json:\n"
+                            + json);
+        }
+    }
+    
+    public void purgeLocalNotifications(int id)
+    {
+        
+        YRDLog.i(YerdyUnity.class, "purgeLocalNotifications:");
+        if(alarm == null)
+            alarm = new YRDLocalReceiver();
+        
+        alarm.CancelAlarm(getRootActivity(), id);
+    }
 }
