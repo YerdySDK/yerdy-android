@@ -64,19 +64,27 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onMessage(Context context, Intent intent) {
     	YRDLog.i(this.getClass(), "onMessage: " + intent.getExtras());
+		
+		
+		String from = intent.getStringExtra("from");
+		if(from.equals("google.com/iid")) {
+			YRDLog.i(this.getClass(), "Preventing Google Message");
+			
+		} else {
+	        String title = intent.getStringExtra("title");
+	        String message = intent.getStringExtra("msg");
+	
+			
+	        if(context == null)
+	        	return;
+	        
+	        if(title == null)
+	        	title = "";
+	        if(message == null)
+	        	message = "";
 
-        String title = intent.getStringExtra("title");
-        String message = intent.getStringExtra("msg");
-
-        if(context == null)
-        	return;
-        
-        if(title == null)
-        	title = "";
-        if(message == null)
-        	message = "";
-        
-        notify(context, MessageID.SERVER, title, message);
+	        notify(context, MessageID.SERVER, title, message);
+		}
     }
 
     @Override
